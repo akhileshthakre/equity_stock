@@ -10,7 +10,7 @@ const Stock = (sequelize) => sequelize.define('stock', {
     allowNull: true,
   },
   price: {
-    type: DataTypes.DECIMAL(10, 2), // Adjust precision and scale based on your requirements
+    type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
   },
   high: {
