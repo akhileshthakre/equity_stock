@@ -19,7 +19,6 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/stocks', stockRoutes)
-// app.use(express.raw({ type: 'text/csv' }));
 
 // Database Connection and Sync
 db.sequelize.sync({ force: false })

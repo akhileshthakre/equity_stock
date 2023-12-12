@@ -28,7 +28,6 @@ const UserController = {
     }
   },
 
-  // Implement other CRUD operations for User here
 };
 
 module.exports = UserController;
