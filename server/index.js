@@ -21,6 +21,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/stocks', stockRoutes)
+app.use('/api/deleteStocks', stockRoutes)
 
 // Database Connection and Sync
 db.sequelize.sync({ force: false })
