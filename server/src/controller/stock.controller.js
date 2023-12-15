@@ -13,6 +13,20 @@ const UserController = {
     }
   },
 
+  deleteAllStocks: async (req, res) => {
+    try {
+        await Stock.destroy({
+          where: {},
+        });
+        res.status(204).send({
+            data: []
+        });
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+  }
+
 };
 
 module.exports = UserController;
