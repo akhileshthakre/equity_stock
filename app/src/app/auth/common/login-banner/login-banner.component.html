@@ -1,0 +1,28 @@
+<div class="px-0 py-4 bg-no-repeat bg-cover text-white hidden flex align-items-center flex-column justify-content-between bg-teal-900 loginBanner h-full">
+    <div>
+            
+    </div>
+    <p-carousel [value]="features" class="mx-4"  [autoplayInterval]="3000">
+    <ng-template let-feature pTemplate="item">
+        <div class="mb-2 p-3  border-round-md" style="background: rgba(255,255,0,0.2);">
+        <div class="font-semibold text-4xl uppercase  font-bold text-center">{{feature.date}}</div>
+        <div class="mx-auto font-medium text-md my-2 uppercase line-height-3  text-center">
+            {{feature.title}}
+        </div>
+        <p class="m-0 line-height-3 text-xs text-center">{{feature.text}}</p>
+        </div>
+    </ng-template>
+    </p-carousel>
+    <div class="text-surface-0 text-md flex align-items-center justify-content-center w-full px-7 pb-4">
+        <a 
+        class="cursor-pointer text-surface-0 text-md hover:text-teal-800 px-2">
+        Terms
+        of Use</a> | 
+        <a 
+        class="cursor-pointer text-surface-0 text-md hover:text-teal-800  px-2">Privacy
+        Policy</a>
+        | 
+        <a 
+        class="cursor-pointer text-surface-0 text-md hover:text-teal-800  px-2">Help</a>
+    </div>
+</div>

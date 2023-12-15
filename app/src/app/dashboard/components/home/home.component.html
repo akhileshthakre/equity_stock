@@ -1,0 +1,54 @@
+<div class="grid">
+  <div class="col col-6">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2 class="px-3 pt-3">File Upload</h2>
+      </ng-template>
+      <p-toast></p-toast>
+      <p-fileUpload name="demo[]"  #fileUpload (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" >
+        <ng-template pTemplate="toolbar">
+          <div class="py-3">Drag and Drop files</div>
+        </ng-template>
+        <ng-template pTemplate="content">
+          <ul *ngIf="uploadedFiles.length">
+            <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
+          </ul>
+        </ng-template>
+
+      </p-fileUpload>
+    </p-card>
+    <p-card styleClass="mt-3">
+      <ng-template pTemplate="header">
+        <h2 class="px-3 pt-3">Stock Table</h2>
+      </ng-template>
+      <p-table [value]="products"  [paginator]="true" [rows]="5" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"  [rowsPerPageOptions]="[5,10, 25, 50]" [tableStyle]="{'min-width': '60rem'}">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="code" style="width:20%">ID <p-sortIcon field="code"></p-sortIcon></th>
+            <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="open" style="width:20%">Open <p-sortIcon field="open"></p-sortIcon></th>
+            <th pSortableColumn="high" style="width:20%">High <p-sortIcon field="high"></p-sortIcon></th>
+            <th pSortableColumn="price" style="width:20%">Price <p-sortIcon field="price"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+          <tr>
+            <td>{{product.id}}</td>
+            <td>{{product.name}}</td>
+            <td>{{product.open}}</td>
+            <td>{{product.high}}</td>
+            <td>{{product.price | currency: 'USD'}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+  <div class="col col-6">
+    <p-card>
+      <ng-template pTemplate="header">
+        <h2 class="px-3 pt-3">Header</h2>
+      </ng-template>
+      <p-chart type="line" [data]="data" [options]="options"></p-chart>
+    </p-card>
+  </div>
+</div>

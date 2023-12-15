@@ -1,0 +1,38 @@
+header {
+  background-color: #333;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+ul {
+  display: flex;
+  list-style: none;
+  gap: 20px;
+}
+
+.menu-item {
+  cursor: pointer;
+}
+
+.logo {
+  font-size: x-large;
+  cursor: pointer;
+}
+
+.logo-part-1 {
+  font-weight: 500;
+}
+
+.logo-part-2 {
+  font-weight: 100;
+}
+
+.logoStyle {
+  font-size: 23px;
+  text-transform: uppercase;
+  font-weight: bolder;
+  color: white;
+}/*# sourceMappingURL=header.component.css.map */
