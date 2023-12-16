@@ -1,0 +1,85 @@
+/* You can add global styles to this file, and also import other style files */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin-top: 0;
+}
+
+.icon {
+  width: 1rem !important;
+  height: 1rem !important;
+  font-size: 1rem !important;
+  vertical-align: bottom;
+  stroke-width: 1.5;
+}
+a{
+  text-decoration: none !important;
+}
+html,
+body {
+  margin: 0;
+  scroll-behavior: smooth;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-size: .88rem !important;
+  font-weight: 400;
+
+  .p-inputtext,
+  .p-component {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-size: .88rem !important;
+    font-weight: 400;
+
+  }
+  .p-inputtext[type=password]{
+    width: 100%;
+  }
+  .p-dropdown {
+    min-height: 34.4px;
+  }
+}
+.p-input-icon-left>i, .p-input-icon-left>.p-icon-wrapper, .p-input-icon-right>i, .p-input-icon-right>.p-icon-wrapper{
+  right: 1rem !important;
+}
+.p-multiselect {
+  min-width: 100%;
+  width:100%;
+}
+
+ .multiselect-custom {
+  .p-multiselect-label {
+      padding-top: .3rem;
+      padding-bottom: .3rem;
+  }
+
+  .country-item-value {
+      padding: .25rem .5rem;
+      border-radius: 3px;
+      display: inline-flex;
+      margin-right: .5rem;
+      background-color: var(--teal-900);
+      color: var(--primary-color-text);
+
+      img.flag {
+          width: 17px;
+      }
+  }
+
+  .country-placeholder {
+      padding: 0.25rem;
+  }
+}
+
+  @media screen and (max-width: 640px) {
+      .p-multiselect {
+          width: 100%;
+      }
+  }
+
+  .loginBanner{
+    background: url('./assets/img/login-banner.webp');
+  }

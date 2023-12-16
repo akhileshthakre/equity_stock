@@ -1,10 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const db = require('./src/model');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
-const userRoutes = require('./src/routes/user/user.routes');
-const uploadRoutes = require('./src/routes/upload/upload.routes');
-const stockRoutes = require('./src/routes/stock/stock.routes')
 
 const app = express();
 
@@ -18,10 +17,25 @@ app.get('/', (req, res) => {
   res.send('API is up');
 });
 
-app.use('/api/users', userRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/stocks', stockRoutes)
-app.use('/api/deleteStocks', stockRoutes)
+//Dynamically load routes from a folder
+const loadRoutesFromFolder = (folderPath, parentRoute = '/api') => {
+  fs.readdirSync(folderPath).forEach((file) => {
+    const fullPath = path.join(folderPath, file);
+    const stat = fs.statSync(fullPath);
+
+    if (stat.isDirectory()) {
+      loadRoutesFromFolder(fullPath, `${parentRoute}/${file}`);
+    } else if (file.endsWith('.routes.js')) {
+      const route = require(fullPath);
+      app.use(parentRoute, route);
+    }
+  });
+};
+
+// Specify the folder where your routes are located
+const routesFolder = path.join(__dirname, 'src/routes');
+
+loadRoutesFromFolder(routesFolder);
 
 // Database Connection and Sync
 db.sequelize.sync({ force: false })

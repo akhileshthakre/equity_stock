@@ -1,0 +1,104 @@
+<!-- Header -->
+<div class="md:px-4 px-3 bg-teal-900 lg:pt-2 lg:pb-1 py-2 z-3 relative flex align-items-center">
+  <a pRipple class="cursor-pointer block lg:hidden text-white mr-4" pStyleClass="#app-sidebar" enterClass="hidden"
+    enterActiveClass="fadeinleft" leaveToClass="hidden" leaveActiveClass="fadeoutleft" [hideOnOutsideClick]="true">
+    <i class="pi pi-bars text-3xl opacity-80"></i>
+  </a>
+  <div class="grid align-items-center lg:w-12 w-7">
+    <div class="lg:col-6 xl:col-3 hidden lg:block">
+      <div class="relative h-2rem w-full">
+        <p class="logoStyle">Equity <span class="text-yellow-300">Research</span></p>
+      </div>
+      </div>
+    <div class="lg:col-7 xl:col-6 hidden lg:block">
+      <div class="relative h-2rem w-full">
+        <i class="pi pi-search absolute mt-2 ml-2 text-400"></i>
+        <input type="text" placeholder="Search Equity"
+          class="w-full border-none h-full border-round p-3 pl-5 surface-100 text-800" />
+      </div>
+    </div>
+    <div class="col-6 lg:col-3 xl:col-2 text-white">
+      <div class="relative lg:z-2 md:mt-0 mt-2">
+        <a pRipple
+          class="cursor-pointer flex pl-2 pr-3 py-2 align-items-center justify-content-between border-round surface-100 text-800"
+          pStyleClass="@next" enterClass="hidden" enterActiveClass="scalein" leaveToClass="hidden"
+          leaveActiveClass="fadeout" [hideOnOutsideClick]="true">
+          <div class="opacity-30 flex align-items-center">
+            <i class="pi pi-filter mr-2"></i>
+            <span>Filter</span>
+          </div>
+          <i class="pi pi-chevron-down opacity-30"></i>
+        </a>
+        <div
+          class="border-round shadow-0 lg:shadow-2 bg-white absolute text-400 hidden origin-top overflow-y-auto w-full">
+          <div class="relative h-3rem p-2 bg-gray-200">
+            <i class="pi pi-search absolute mt-2 ml-2 opacity-40"></i>
+            <input type="text" placeholder="Search Stocks..."
+              class="w-full border-1 h-full border-round p-2 pl-5" />
+          </div>
+          <div class="px-2 py-1">
+            <h4 class="text-900 text-uppercase m-0 mb-1 px-2">IT Stock Bucket</h4>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">TCS<span class="p-ink"></span></a>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">Wipro</a>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">Mphasis</a>
+          </div>
+
+          <div class="px-2 py-1">
+            <h4 class="text-900 text-uppercase m-0 mb-1 px-2">Engergy Stock Bucket</h4>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">Adani power<span class="p-ink"></span></a>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">KWS</a>
+            <a pRipple href="javascript:;"
+              class="p-ripple p-element p-2 block text-800 no-underline hover:bg-gray-800 hover:text-white font-medium border-round cursor-pointer transition-colors transition-duration-150">TmF Energy</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="flex justify-content-end lg:w-1 w-5">
+    <ul class="list-none p-0 m-0 flex align-items-center z-1">
+      <li class="mr-2 block lg:hidden"><button class="bg-white text-primary border-primary-600 w-2rem h-2rem"
+          pButton pRipple label="" icon="pi pi-search" pStyleClass="#mobileSearch" enterClass="hidden"
+          enterActiveClass="fadeinleft" leaveToClass="hidden" leaveActiveClass="fadeoutleft"
+          [hideOnOutsideClick]="true"></button></li>
+      <!-- <li class="mr-2 block lg:hidden"><button class="w-2rem h-2rem" pButton pRipple label=""
+          icon="pi pi-plus"></button></li> -->
+      <!-- <li class="hidden md:block">
+        <p-fileUpload mode="basic" styleClass="text-sm line-height-1 h-2rem mr-2" chooseLabel="Choose" name=""  accept="image/*" [maxFileSize]="1000000" (onUpload)="onUpload($event)"></p-fileUpload>
+      </li> -->
+      <li class="relative">
+          <a pRipple
+            class="cursor-pointer"
+            pStyleClass="@next" enterClass="hidden" enterActiveClass="scalein" leaveToClass="hidden"
+            leaveActiveClass="fadeout" [hideOnOutsideClick]="true">
+            <p-avatar label="BS"  pBadge value="0" severity="danger" ></p-avatar>
+          </a>
+          <div class="bg-white border-round shadow-2 absolute right-0 hidden origin-top w-14rem text-sm">
+            <div class="p-2">
+            <div class="flex align-items-center justify-content-between mb-2">
+            <div class="font-bold mr-2">John Dew</div>
+            <div class="bg-blue-50 border-primary border-1 px-2 py-1 font-bold border-round text-primary text-xxs">ADMIN</div>
+            </div>
+            <div class="flex align-items-center">
+            <i class="pi pi-phone mr-2"></i>
+            <span>+91 9899 000987</span>
+            </div>
+          </div>
+          <p-divider styleClass="my-0"></p-divider>
+          <div class="p-2 text-primary flex font-bold cursor-pointer align-items-center">
+          <i class="pi pi-sign-out mr-2"></i>
+          <span>Logout</span>
+          </div>
+          </div>
+      </li>
+
+    </ul>
+  </div>
+</div>
+<!-- Header -->

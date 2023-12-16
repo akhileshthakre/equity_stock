@@ -1,0 +1,58 @@
+<div class="surface-ground text-sm">
+  <div class="flex flex-wrap min-h-screen xl:fixed w-full h-full">
+    <div class="w-full xl:w-4  ">
+     <app-login-banner></app-login-banner>
+    </div>
+    <div class="w-full xl:w-8 surface-card overflow-y-auto h-full flex align-items-center justify-content-between flex-column ">
+
+      <div class="w-full">
+        <div class="text-right my-3 mx-5">
+         <!-- <app-lang-dropdown></app-lang-dropdown> -->
+        </div>
+      </div>
+      <!-- Top Part -->
+      <div class="p-4 lg:p-7 w-full">
+        <div class="grid justify-content-center">
+          <div class="xl:col-10">
+              <h1 class="block mx-auto mb-6 text-7xl"><span class="text-teal-900">EQUITY </span> <span class="text-yellow-500">RESEARCH</span></h1>
+              <p class="text-lg">Welcome to Equity Research,</p>
+              <p class="text-lg mb-3">Please Sign in to your account</p>
+              <p class="text-lg">No Account? <a class="text-teal-900 underline cursor-pointer font-bold"  routerLink="/auth/sign-up" >Sign up</a></p>
+              <form
+              [formGroup]="loginForm"
+              (ngSubmit)="onLogin()">
+              <p-divider></p-divider>
+              <div class="flex align-items-center justify-content-start full-width my-5">
+                  <div class="col-6">
+                      <div class="font-medium text-gray-600 text-lg mb-2 block">Username</div>
+                      <input id="email4" type="text" pInputText class="w-full mb-4 text-lg " placeholder="Enter username(e.g user@abc.com)"  formControlName="username" >
+
+                    </div>
+                  <div class="col-6">
+                      <div class="font-medium text-gray-600 text-lg mb-2 block">Password</div>
+                      <p-password [toggleMask]="true" [feedback]="false" styleClass="p-input-icon-right w-full mb-4" formControlName="password"  placeholder="Enter password" ></p-password>
+
+                    </div>
+              </div>
+
+              <p-divider></p-divider>
+              <div class="flex align-items-center justify-content-end">
+                <button pButton pRipple type="button" label="Recover Password"  routerLink="/auth/forgot-password"  class="font-medium p-button-secondary p-button-text text-lg mr-3 hover:text-teal-900"></button>
+                <button pButton pRipple label="Signin" class="font-medium text-xl" type="submit" [disabled]="!loginForm.valid"></button>
+
+              </div>
+
+            </form>
+            <!-- <img class="block mx-auto mb-4" width="205" src="/assets/img/logo.svg" alt="Active 2 Fitness" /> -->
+          </div>
+        </div>
+      </div>
+      <!-- Top Part -->
+
+      <!-- Bottom Part -->
+     <app-login-footer></app-login-footer>
+      <!-- Bottom Part -->
+
+    </div>
+  </div>
+</div>
