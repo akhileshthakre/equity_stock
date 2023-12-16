@@ -6,7 +6,7 @@ const Stock = (sequelize) => sequelize.define('stock', {
     allowNull: true,
   },
   period: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     allowNull: true,
   },
   price: {
