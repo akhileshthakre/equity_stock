@@ -26,7 +26,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-db.users = require('./User')(sequelize, Sequelize);
+db.user = require('./user')(sequelize, Sequelize);
 db.stocks = require('./stock')(sequelize, Sequelize);
 db.testValues = require('./testValues')(sequelize, Sequelize);
 

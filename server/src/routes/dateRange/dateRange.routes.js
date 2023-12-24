@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { authenticateToken, authorizeRoles } = require('../../middleware/auth');
-const CalculationService= require('../../controller/calculation/calculation');
+const DateRangeController = require('../../controller/dateRange.controller');
 
-router.get('/', authenticateToken, CalculationService.fetchData);
+router.get('/', authenticateToken, DateRangeController.fetchDateRange);
 
 module.exports = router;
