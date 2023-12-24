@@ -1,7 +1,7 @@
 
-const constantTS = 0.08 / 100; // Replace this with W1 from sheet
-const constantSloss = 10 / 100; // Change with the actual M2 from the sheet
-const constantTGT = 25 / 100; //change it with the N2 of the sheet
+const constantTS = 0.08 / 100; // change this with W1 from sheet as user input
+const constantSloss = 10 / 100; // Change with the actual M2 from the sheet as user input
+const constantTGT = 25 / 100; //change it with the N2 of the sheet as user input
 
 const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const fallInStock = testValue.fallInStock
