@@ -3,7 +3,6 @@ const Stock = db.stocks;
 const TestValue = db.testValues
 
 const convertSheetColumnsToDatabase = (sheetColumns) => {
-    console.log('SHeet', sheetColumns)
     const columnMapping = {
       'fall in stock': 'fallInStock',
       'limit level': 'limitLevel',

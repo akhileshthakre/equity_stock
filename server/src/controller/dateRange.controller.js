@@ -17,7 +17,7 @@ const fetchRange = async (startDate, endDate)  => {
       }
   }
 
-const CalculationController = {
+const DateRangeController = {
   fetchDateRange: async (req, res) => {
     const { startDate, endDate } = req.body;
     try {
@@ -33,4 +33,4 @@ const CalculationController = {
 
 };
 
-module.exports = CalculationController;
+module.exports = DateRangeController;

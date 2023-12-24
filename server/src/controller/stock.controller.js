@@ -1,7 +1,7 @@
 const db = require('../model');
 const Stock = db.stocks
 
-const UserController = {
+const StockController = {
   getAllStock: async (req, res) => {
     try {
       const stocks = await Stock.findAll();
@@ -29,4 +29,4 @@ const UserController = {
 
 };
 
-module.exports = UserController;
+module.exports = StockController;
