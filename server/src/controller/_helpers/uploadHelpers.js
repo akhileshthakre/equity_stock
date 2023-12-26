@@ -14,7 +14,11 @@ const convertSheetColumnsToDatabase = (sheetColumns) => {
 // Function to process data from the Excel file and update the RDS database
 const processAndSyncData = async (worksheet, fileType, fileName) => {
 let databaseColumns
-const originalFileName = fileName.split('.')
+let originalFileName
+if(fileType === "stockFile") {
+  originalFileName = fileName.split('.')
+
+}
 try{
     const columns = getColumnsFromHeaderRow(worksheet.getRow(1).values);
 
@@ -46,7 +50,7 @@ try{
         if (rowData.every(cell => cell === undefined || cell === null)) {
           continue;
         }
-        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns: columns, rowData, originalFileName[0]);
+        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns: columns, rowData, originalFileName ? originalFileName[0] : '');
         // Skip rows with unexpected values
         if (rowObject === null) {
           continue;

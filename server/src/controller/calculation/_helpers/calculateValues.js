@@ -1,7 +1,7 @@
 
-const constantTS = 0.08 / 100; // change this with W1 from sheet as user input
-const constantSloss = 10 / 100; // Change with the actual M2 from the sheet as user input
-const constantTGT = 25 / 100; //change it with the N2 of the sheet as user input
+let constantTS // change this with W1 from sheet as user input
+let constantSloss // Change with the actual M2 from the sheet as user input
+let constantTGT //change it with the N2 of the sheet as user input
 
 const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const fallInStock = testValue.fallInStock
@@ -295,7 +295,11 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     return Math.round(number * factor) / factor;
   }
   
-  const calculateValues = (stocks, testCases) => {
+  const calculateValues = (stocks, testCases, slossPercent, tgPercent, tsPercent) => {
+    constantTGT = tgPercent ? tgPercent / 100 : 25 / 100
+    constantSloss = slossPercent ? slossPercent / 100 : 10 / 100
+    constantTS = tsPercent ? tsPercent / 100 : 0.08 / 100
+
     const fallInStock = testCases.fallInStock * 100
     const limitLevel = testCases.limitLevel * 100
     const hldDay = Number(testCases.hldDay)
