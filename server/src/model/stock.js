@@ -9,6 +9,7 @@ const Stock = (sequelize) => sequelize.define('stock', {
     type: DataTypes.DATEONLY,
     allowNull: true,
   },
+  //this store the close column value or price column value
   price: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
@@ -20,10 +21,6 @@ const Stock = (sequelize) => sequelize.define('stock', {
   low: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false,
-  },
-  close: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: true,
   },
   open: {
     type: DataTypes.DECIMAL(10, 2),
