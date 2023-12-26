@@ -1,1 +1,10 @@
 <router-outlet></router-outlet>
+<!-- <ngx-spinner size="medium" color="#fff" type="ball-atom" [fullScreen]="fullScreen" class="myspinner"></ngx-spinner> -->
+
+<!-- <ng-container *ngIf="showSpinner">
+    <p-progressSpinner></p-progressSpinner>
+</ng-container> -->
+
+<ng-container *ngIf="(showSpinner | async)">
+    <p-progressSpinner class="overlay" strokeWidth="1"></p-progressSpinner>
+</ng-container>

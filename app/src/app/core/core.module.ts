@@ -13,6 +13,7 @@ import { RippleModule } from 'primeng/ripple';
 import {AvatarModule} from 'primeng/avatar';
 import {BadgeModule} from 'primeng/badge';
 import { FileUploadModule } from 'primeng/fileupload';
+// import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
   declarations: [
@@ -31,7 +32,8 @@ import { FileUploadModule } from 'primeng/fileupload';
     DividerModule,
     AvatarModule,
     BadgeModule,
-    FileUploadModule
+    FileUploadModule,
+    // NgxSpinnerModule
   ]
 })
 export class CoreModule { }

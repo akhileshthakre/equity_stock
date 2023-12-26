@@ -6,5 +6,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./layout-with-hf.component.scss']
 })
 export class LayoutWithHfComponent {
-
+ // typeSelected = 'ball-fussion';
 }

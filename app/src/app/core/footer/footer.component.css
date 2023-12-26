@@ -29,4 +29,9 @@ footer {
   text-decoration: none;
   display: block;
   margin-bottom: 5px;
+}
+
+.main {
+  background: #0f6cb0;
+  color: white;
 }/*# sourceMappingURL=footer.component.css.map */

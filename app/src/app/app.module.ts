@@ -5,7 +5,13 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ChartModule } from 'primeng/chart';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
+import { TokenInterceptor } from './shared/interceptors/token.interceptor';
+import { NgxSpinnerModule } from 'ngx-spinner';
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { MessagesModule } from 'primeng/messages';
+import { MessageModule } from 'primeng/message';
+import { ToastModule } from 'primeng/toast';
 @NgModule({
   declarations: [
     AppComponent
@@ -16,9 +22,12 @@ import { HttpClientModule } from '@angular/common/http';
     AppRoutingModule,
     ReactiveFormsModule,
     ChartModule,
-    HttpClientModule
+    HttpClientModule,
+    ProgressSpinnerModule,
+    NgxSpinnerModule,
+    ToastModule, MessagesModule, MessageModule 
   ],
-  providers: [],
+  providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
 
   bootstrap: [AppComponent]
 })

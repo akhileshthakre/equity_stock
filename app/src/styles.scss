@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-
+@import "primeicons/primeicons.css";
 h1,
 h2,
 h3,
@@ -81,5 +81,9 @@ body {
   }
 
   .loginBanner{
-    background: url('./assets/img/login-banner.webp');
+    // background: url('./assets/img/login-banner.webp');
+    // background: url('./assets/img/business-concept.jpg');
+    background: url('./assets/img/iStock.jpg');
+    // background-position: center;
+    // background-size: contain;
   }

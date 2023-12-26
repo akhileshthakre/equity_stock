@@ -1,0 +1,50 @@
+.main {
+    max-width: 90%;
+    margin: auto;
+}
+
+.stock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    margin: auto;
+}
+
+td,
+th {
+    text-align: center !important;
+}
+
+.back-test {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+// .backTestForm{
+//     display: flex;
+//     gap: 3px;
+// }
+// .back-test p-button {
+//     position: relative;
+//     bottom: 5px;
+// }
+
+// .back-test p-button :hover{
+//  background: #0F6CB0;
+// }
+
+ 
+
+// .overlay{
+//     position:fixed !important;
+//     top: 0;
+//     left: 0;
+//     width: 100% !important;
+//     height: 100% !important;
+//     z-index: 100; /* this seems to work for me but may need to be higher*/
+//     background-color: black;
+//     opacity: 0.5;
+//     margin: auto;
+// }

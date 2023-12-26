@@ -7,8 +7,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginBannerComponent implements OnInit {
   features: any[] =  [
-    { date: 'EQUITY', title: 'Lorem ipsum is really awesome', text: '' },
-    { date: 'REASEARCH', title: 'Lorem ipsum is really awesome', text: '' },
+    { date: 'ALGO', title: 'Lorem ipsum is really awesome', text: '' },
+    { date: 'DESIGN', title: 'Lorem ipsum is really awesome', text: '' },
 ];
   constructor() { }
 
