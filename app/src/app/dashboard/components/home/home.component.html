@@ -1,54 +1,214 @@
-<div class="grid">
-  <div class="col col-6">
-    <p-card>
-      <ng-template pTemplate="header">
-        <h2 class="px-3 pt-3">File Upload</h2>
+<div class="grid main">
+  <p-card class="col-4">
+    <ng-template pTemplate="header">
+      <h2 class="pt-1 pl-2 mb-1">Upload Price</h2>
+    </ng-template>
+    <p-toast></p-toast>
+    <p-fileUpload name="demo[]" #fileUpload (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"
+      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+      <ng-template pTemplate="content">
+        <ul *ngIf="uploadedFiles.length">
+          <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
+        </ul>
       </ng-template>
-      <p-toast></p-toast>
-      <p-fileUpload name="demo[]"  #fileUpload (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"  accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" >
-        <ng-template pTemplate="toolbar">
-          <div class="py-3">Drag and Drop files</div>
-        </ng-template>
-        <ng-template pTemplate="content">
-          <ul *ngIf="uploadedFiles.length">
-            <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
-          </ul>
-        </ng-template>
+    </p-fileUpload>
+  </p-card>
+  <p-card class="col-4">
+    <ng-template pTemplate="header">
+      <h2 class="pt-1 pl-2 mb-1">Upload Test Values</h2>
+    </ng-template>
+    <p-toast></p-toast>
+    <p-fileUpload name="demo[]" #fileUploadForTestValues
+      (uploadHandler)="onUploadTestValues($event,fileUploadForTestValues)" [customUpload]="true"
+      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+      <ng-template pTemplate="content">
+        <ul *ngIf="uploadedTestValues.length">
+          <li *ngFor="let file of uploadedTestValues">{{ file.name }} - {{ file.size }} bytes</li>
+        </ul>
+      </ng-template>
+    </p-fileUpload>
+  </p-card>
 
-      </p-fileUpload>
-    </p-card>
+  <p-card class="col-4">
+    <div>
+      <div class="back-test">
+        <h2 class="pl-2 mb-1">Back Test</h2>
+        <p-button class="pt-1" label="Start Back Test" (click)="startBackTest(1)"></p-button>
+      </div>
+      <form class="backTestForm" [formGroup]="backTestForm" class=" flex gap-1 pt-5">
+        <div class="form-input">
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="SLOSS %" class="p-inputtext-sm"
+            formControlName="slossPercent" />
+        </div>
+        <div class="form-input">
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TG %" class="p-inputtext-sm"
+            formControlName="tgPercent" />
+        </div>
+        <div class="form-input">
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TS %" class="p-inputtext-sm"
+            formControlName="tsPercent" />
+        </div>
+      </form>
+    </div>
+  </p-card>
+</div>
+
+<div class="grid main">
+  <div class="col-6" *ngIf="products.length">
     <p-card styleClass="mt-3">
       <ng-template pTemplate="header">
-        <h2 class="px-3 pt-3">Stock Table</h2>
+        <div class="stock-header">
+          <h2 class="px-3 pt-3">Stock Table</h2>
+          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(1)"></i>
+        </div>
       </ng-template>
-      <p-table [value]="products"  [paginator]="true" [rows]="5" currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"  [rowsPerPageOptions]="[5,10, 25, 50]" [tableStyle]="{'min-width': '60rem'}">
+      <!-- [tableStyle]="{'min-width': '60rem'}" -->
+      <p-table [value]="products" [paginator]="true" [rows]="5"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[5,10, 25, 50]">
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="code" style="width:20%">ID <p-sortIcon field="code"></p-sortIcon></th>
-            <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon></th>
+            <th pSortableColumn="date" style="width:20%">Date <p-sortIcon field="date"></p-sortIcon></th>
             <th pSortableColumn="open" style="width:20%">Open <p-sortIcon field="open"></p-sortIcon></th>
             <th pSortableColumn="high" style="width:20%">High <p-sortIcon field="high"></p-sortIcon></th>
-            <th pSortableColumn="price" style="width:20%">Price <p-sortIcon field="price"></p-sortIcon></th>
+            <th pSortableColumn="low" style="width:20%">Low <p-sortIcon field="low"></p-sortIcon></th>
+            <th pSortableColumn="price" style="width:20%">Close <p-sortIcon field="price"></p-sortIcon></th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
-            <td>{{product.id}}</td>
-            <td>{{product.name}}</td>
+            <td>{{product.period | date:'dd-MM-yyyy'}}</td>
             <td>{{product.open}}</td>
             <td>{{product.high}}</td>
-            <td>{{product.price | currency: 'USD'}}</td>
+            <td>{{product.low}}</td>
+            <td>{{product.price}}</td>
           </tr>
         </ng-template>
       </p-table>
     </p-card>
   </div>
-  <div class="col col-6">
-    <p-card>
+  <div class="col-6" *ngIf="testList.length">
+    <p-card styleClass="mt-3">
       <ng-template pTemplate="header">
-        <h2 class="px-3 pt-3">Header</h2>
+        <div class="stock-header">
+          <h2 class="px-3 pt-3">Test Values</h2>
+          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(2)"></i>
+        </div>
       </ng-template>
-      <p-chart type="line" [data]="data" [options]="options"></p-chart>
+      <p-table [value]="testList" [paginator]="true" [rows]="5"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[5,10, 25, 50] ">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>
+            <th pSortableColumn="limitLevel">Limit Level <p-sortIcon field="limitLevel"></p-sortIcon></th>
+            <th pSortableColumn="hldDay">Hld Day <p-sortIcon field="hldDay"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+          <tr>
+            <td>{{product.fallInStock | number}}</td>
+            <td>{{product.limitLevel | number}}</td>
+            <td>{{product.hldDay}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
     </p-card>
   </div>
 </div>
+<div class="out-put main" *ngIf="showOutPutTable && outputList.length">
+  <p-card styleClass="mt-3">
+    <ng-template pTemplate="header">
+      <div class="stock-header">
+        <h2 class="px-3 pt-3">Output Table</h2>
+        <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="downloadInExcl()"></i>
+      </div>
+    </ng-template>
+    <p-table [value]="outputList" [paginator]="true" [rows]="5"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[5,10, 25, 50]">
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="nameOfStock"> Name <p-sortIcon field="nameOfStock"></p-sortIcon></th>
+          <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>
+          <th pSortableColumn="limitLevel">LimitLevel <p-sortIcon field="limitLevel"></p-sortIcon></th>
+          <th pSortableColumn="hldDay">HoldingDay <p-sortIcon field="hldDay"></p-sortIcon></th>
+          <th pSortableColumn="totalDays">#OfDays <p-sortIcon field="totalDays"></p-sortIcon></th>
+          <th pSortableColumn="totalRetSum">TotalSum <p-sortIcon field="totalRetSum"></p-sortIcon></th>
+          <th pSortableColumn="avgGain">AvgGain <p-sortIcon field="avgGain"></p-sortIcon></th>
+          <th pSortableColumn="winPercent">Win% <p-sortIcon field="winPercent"></p-sortIcon></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{product.nameOfStock}}</td>
+          <td>{{product.fallInStock | number}}</td>
+          <td>{{product.limitLevel | number}}</td>
+          <td>{{product.hldDay}}</td>
+          <td>{{product.totalDays}}</td>
+          <td>{{product.totalRetSum | number}}</td>
+          <td>{{product.avgGain | number}}</td>
+          <td>{{product.winPercent | number}}</td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+    <div class="flex justify-content-between mb-2">
+      <div><i class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" tooltipPosition="top" pTooltip="Prev"
+          (click)="prevPage()"></i></div>
+      <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
+          (click)="nextPage()"></i></div>
+    </div>
+
+
+    <!-- <p-table [value]="outputList" styleClass="p-datatable-gridlines">
+      <ng-template pTemplate="caption">
+     
+        <div class="stock-header">
+          <h2 class="px-3 pt-3">Output Table</h2>
+          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="exportToExcl(3)"></i>
+        </div>
+      </ng-template>
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Name</th>
+          <th>Fall in Stock</th>
+          <th>LimitLevel</th>
+          <th>HoldingDay</th>
+          <th>#OfDays</th>
+          <th>TotalSum</th>
+          <th>AvgGain</th>
+          <th>Win%</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-product>
+        <tr>
+          <td>{{product.name}}</td>
+          <td>{{product.fallInStock | number}}</td>
+          <td>{{product.limitLevel | number}}</td>
+          <td>{{product.hldDay}}</td>
+          <td>{{product.totalDays}}</td>
+          <td>{{product.totalRetSum | number}}</td>
+          <td>{{product.avgGain | number}}</td>
+          <td>{{product.winPercent | number}}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="summary">
+        <div>jhkshfdsf</div>
+      </ng-template>
+    </p-table> -->
+
+
+
+
+  </p-card>
+</div>
+<div class="flex justify-content-center my-5">
+  <video controls="false" autoplay loop muted style="width: 70%;">
+    <source src="/assets/videos/stock video.mp4" type="video/mp4">
+  </video>
+
+</div>
+<!-- <ng-container *ngIf="showSpinner">
+  <p-progressSpinner class="overlay" strokeWidth="1"></p-progressSpinner>
+</ng-container> -->

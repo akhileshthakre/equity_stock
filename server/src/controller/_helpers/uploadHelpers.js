@@ -12,13 +12,30 @@ const convertSheetColumnsToDatabase = (sheetColumns) => {
   };
 
 // Function to process data from the Excel file and update the RDS database
-const processAndSyncData = async (worksheet, fileType) => {
+const processAndSyncData = async (worksheet, fileType, fileName) => {
 let databaseColumns
+const originalFileName = fileName.split('.')
 try{
     const columns = getColumnsFromHeaderRow(worksheet.getRow(1).values);
 
     if(fileType === 'testFile') {
      databaseColumns = convertSheetColumnsToDatabase(columns);
+    }
+
+    if(fileType === 'stockFile') {
+      if(columns.includes('close')) {
+        const index = columns.indexOf('close') 
+        columns[index] = 'price'
+      }
+
+      if(columns.includes('date')) {
+        const index = columns.indexOf('date')
+          columns[index] = 'period'
+      }
+
+      if(!columns.includes('name')) {
+        columns[columns.length] = 'name'
+      }
     }
 
     const rows = [];
@@ -29,7 +46,7 @@ try{
         if (rowData.every(cell => cell === undefined || cell === null)) {
           continue;
         }
-        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns: columns, rowData);
+        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns: columns, rowData, originalFileName[0]);
         // Skip rows with unexpected values
         if (rowObject === null) {
           continue;
@@ -59,11 +76,19 @@ try{
     return headerRow.filter(column => column !== undefined).map((column) => column.toString().toLowerCase());
   };
   
-  const mapRowToObject = (columns, rowData) => {
-    const data = rowData.filter(row => row !== undefined).map((row) => row)
+  const mapRowToObject = (columns, rowData, sheetName) => {
+    const data = rowData.filter(row => row !== undefined).map((row) => row);
     const rowObject = {};
+  
+    if (columns.includes('name')) {
+      const nameIndex = columns.indexOf('name');
+      rowObject[columns[nameIndex]] = sheetName;
+    }
+  
     columns.forEach((column, index) => {
-      rowObject[column] = data[index];
+      if (column !== 'name') {
+        rowObject[column] = data[index];
+      }
     });
 
     return rowObject;

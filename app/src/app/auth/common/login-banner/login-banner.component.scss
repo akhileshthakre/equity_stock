@@ -1,0 +1,11 @@
+.logo-img img{
+    animation: rotateImg 3s linear infinite;
+  }
+  @keyframes rotateImg{
+    from {
+     transform: rotatey(0deg);
+    }
+   to {
+    transform: rotatey(359deg);
+   }
+  }

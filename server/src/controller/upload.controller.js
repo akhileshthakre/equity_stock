@@ -19,7 +19,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
         const worksheet = workbook.worksheets[0];
         const foundValue = path.find(item => item === 'stockFile');
         if (foundValue) {
-            await processAndSyncData(worksheet, 'stockFile');
+            await processAndSyncData(worksheet, 'stockFile', file.originalname);
         } else {
             await processAndSyncData(worksheet, 'testFile');
         }

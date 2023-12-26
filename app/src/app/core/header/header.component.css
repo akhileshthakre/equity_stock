@@ -35,4 +35,15 @@ ul {
   text-transform: uppercase;
   font-weight: bolder;
   color: white;
+}
+
+.header-bg {
+  background-color: #0f6cb0;
+}
+
+.logo-text {
+  color: white;
+  font-size: 23px;
+  text-transform: uppercase;
+  font-weight: bolder;
 }/*# sourceMappingURL=header.component.css.map */

@@ -1,1 +1,11 @@
-/*# sourceMappingURL=app.component.css.map */
+.overlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 100; /* this seems to work for me but may need to be higher*/
+  background-color: black;
+  opacity: 0.5;
+  margin: auto;
+}/*# sourceMappingURL=app.component.css.map */

@@ -1,1 +1,12 @@
-/*# sourceMappingURL=login-banner.component.css.map */
+.logo-img img {
+  animation: rotateImg 3s linear infinite;
+}
+
+@keyframes rotateImg {
+  from {
+    transform: rotatey(0deg);
+  }
+  to {
+    transform: rotatey(359deg);
+  }
+}/*# sourceMappingURL=login-banner.component.css.map */

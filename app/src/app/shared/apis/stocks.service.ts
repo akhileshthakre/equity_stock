@@ -10,15 +10,48 @@ import { END_POINT_CONST } from "../constants/endpoints.const";
 })
 export class StocksApiService {
 
-  constructor(private _http: HttpClient){}
-  uploadStockXlsxFile(payload:any){
+  constructor(private _http: HttpClient) { }
+
+  handleError(error: Error): any {
+    return throwError(error);
+  }
+
+  getToken(payload: any) {
+    let params = new HttpParams();
+    const headers = new HttpHeaders();
+    headers.set('Accept', "multipart/form-data");
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.GET_TOKEN}`, payload, { params, headers }).pipe(map((res: any) => {
+      if (res) {
+        return res;
+      }
+    }), catchError(this.handleError)
+    )
+  }
+
+  uploadStockXlsxFile(payload: any) {
     let params = new HttpParams();
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
     formData.append('file', payload[0]);
     console.log(formData)
-    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_FILE}`,formData, { params, headers }).pipe(
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_FILE}`, formData, { params, headers }).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+  uploadTestValuesXlsxFile(payload: any) {
+    let params = new HttpParams();
+    const headers = new HttpHeaders();
+    headers.set('Accept', "multipart/form-data");
+    const formData = new FormData();
+    formData.append('file', payload[0]);
+    console.log(formData)
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_TEST_FILE}`, formData, { params, headers }).pipe(
       map((res: any) => {
         if (res) {
           return res;
@@ -28,10 +61,10 @@ export class StocksApiService {
     );
   }
 
-  getAllStockInfo(){ 
+  getAllStockInfo() {
     return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.GET_ALL_STOCKS}`).pipe(
       map((res: any) => {
-        if (res) { 
+        if (res) {
           return res;
         }
       }),
@@ -39,8 +72,46 @@ export class StocksApiService {
     );
   }
 
-
-  handleError(error: Error):any {
-    return throwError(error);
+  getAllTestValuesInfo() {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.GET_ALL_TEST_VALUES}`).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
   }
+
+  deleteAllStockList(): any {
+    return this._http.delete<any>(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.DELETE_STOCK_LIST}`).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+  deleteAllTestList() {
+    return this._http.delete(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.DELETE_TEST_LIST}`).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+  calculateOutPut(payload: any) {
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.CALCULATE}`, payload).pipe(map((res: any) => {
+      if (res) {
+        return res;
+      }
+    })
+      , catchError(this.handleError)
+    )
+  }
+
+
 }
