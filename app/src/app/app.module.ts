@@ -12,6 +12,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { MessagesModule } from 'primeng/messages';
 import { MessageModule } from 'primeng/message';
 import { ToastModule } from 'primeng/toast';
+import { httpInterceptorProviders } from './shared/interceptors';
+import { AuthGuardService } from './shared/guards/auth-guard.service';
 @NgModule({
   declarations: [
     AppComponent
@@ -27,7 +29,7 @@ import { ToastModule } from 'primeng/toast';
     NgxSpinnerModule,
     ToastModule, MessagesModule, MessageModule 
   ],
-  providers: [{ provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }],
+  providers: [ httpInterceptorProviders, AuthGuardService],
 
   bootstrap: [AppComponent]
 })

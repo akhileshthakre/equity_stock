@@ -27,6 +27,14 @@ export class StocksApiService {
     }), catchError(this.handleError)
     )
   }
+  registerUser(payload: any) { 
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.REGISTER}`, payload ).pipe(map((res: any) => {
+      if (res) {
+        return res;
+      }
+    }), catchError(this.handleError)
+    )
+  }
 
   uploadStockXlsxFile(payload: any) {
     let params = new HttpParams();

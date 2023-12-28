@@ -41,11 +41,11 @@
             formControlName="slossPercent" />
         </div>
         <div class="form-input">
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TG %" class="p-inputtext-sm"
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TGT %" class="p-inputtext-sm"
             formControlName="tgPercent" />
         </div>
         <div class="form-input">
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TS %" class="p-inputtext-sm"
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TSC %" class="p-inputtext-sm"
             formControlName="tsPercent" />
         </div>
       </form>
@@ -107,9 +107,9 @@
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
-            <td>{{product.fallInStock | number}}</td>
-            <td>{{product.limitLevel | number}}</td>
-            <td>{{product.hldDay}}</td>
+            <td>{{product.fallInStock  }}</td>
+            <td>{{product.limitLevel }} </td>
+            <td>{{product.hldDay }}</td>
           </tr>
         </ng-template>
       </p-table>
@@ -142,13 +142,13 @@
       <ng-template pTemplate="body" let-product>
         <tr>
           <td>{{product.nameOfStock}}</td>
-          <td>{{product.fallInStock | number}}</td>
-          <td>{{product.limitLevel | number}}</td>
+          <td>{{product.fallInStock }}</td>
+          <td>{{product.limitLevel}}</td>
           <td>{{product.hldDay}}</td>
           <td>{{product.totalDays}}</td>
-          <td>{{product.totalRetSum | number}}</td>
-          <td>{{product.avgGain | number}}</td>
-          <td>{{product.winPercent | number}}</td>
+          <td>{{product.totalRetSum}}</td>
+          <td>{{product.avgGain}}</td>
+          <td>{{product.winPercent}}</td>
         </tr>
       </ng-template>
 

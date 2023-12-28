@@ -13,6 +13,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SharedModule } from '../shared/shared.module'; 
 import { ProgressSpinnerModule } from 'primeng/progressspinner'; 
+import { AuthGuardService } from '../shared/guards/auth-guard.service';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
     InputTextModule,
     SharedModule,
     ProgressSpinnerModule, 
-  ]
+  ],
+  providers : [AuthGuardService]
 })
 export class DashboardModule { }

@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LayoutWithHfComponent } from './layout-with-hf/layout-with-hf.component';
+import { LayoutWithHfComponent } from './layout-with-hf/layout-with-hf.component'; 
 
 const routes: Routes = [
   {
@@ -9,8 +9,7 @@ const routes: Routes = [
     children: [
       {
           path:'',
-          loadChildren: () => import('../dashboard/dashboard.module').then(d => d.DashboardModule)
-      }
+          loadChildren: () => import('../dashboard/dashboard.module').then(d => d.DashboardModule)   }
     ]
   }
 ];

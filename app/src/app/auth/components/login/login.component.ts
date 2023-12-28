@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router'; 
+import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { StocksApiService } from 'src/app/shared/apis/stocks.service';
 import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
@@ -20,8 +20,8 @@ export class LoginComponent {
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
-      username: ['admin', Validators.required],
-      password: ['admin', Validators.required]
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     });
   }
 
@@ -43,8 +43,8 @@ export class LoginComponent {
               this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to login' })
             }
           },
-          error: (err: any) => { 
-            this.messageService.add({ severity: 'error', summary: 'Error', detail:"Invalid username or password" })
+          error: (err: any) => {
+            this.messageService.add({ severity: 'error', summary: 'Error', detail: "Invalid username or password" })
             this.spinnerService.showSpinner(false)
           }
         })
