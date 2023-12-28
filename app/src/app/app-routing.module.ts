@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UnauthorizedaccessComponent } from './shared/components/unauthorizedaccess/unauthorizedaccess.component';
 import { PagenotfoundComponent } from './shared/components/pagenotfound/pagenotfound.component';
+import { AuthGuardService } from './shared/guards/auth-guard.service';
 
 const routes: Routes = [
   {
@@ -15,7 +16,7 @@ const routes: Routes = [
   },
   {
     path:'dashboard',
-    loadChildren: () => import('./core/core.module').then(c => c.CoreModule )
+    loadChildren: () => import('./core/core.module').then(c => c.CoreModule ) 
   },
   {
     path: 'unauthorized',
