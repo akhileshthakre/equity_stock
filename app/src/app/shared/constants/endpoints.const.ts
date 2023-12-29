@@ -1,6 +1,7 @@
 export const END_POINT_CONST = {
     STOCKS: {
         GET_TOKEN: '/user/login',
+        REGISTER: '/user/register',
         UPLOAD_FILE: '/upload/stockFile',
         UPLOAD_TEST_FILE: '/upload/testFile',
         GET_ALL_STOCKS: '/stock',

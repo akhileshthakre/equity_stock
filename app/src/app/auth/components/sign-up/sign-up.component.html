@@ -1,0 +1,68 @@
+<div class="surface-ground text-sm">
+    <div class="flex flex-wrap min-h-screen xl:fixed w-full h-full">
+        <div class="w-full xl:w-6  ">
+            <app-login-banner></app-login-banner>
+        </div>
+        <div
+            class="w-full xl:w-6 surface-card overflow-y-auto h-full flex align-items-center justify-content-between flex-column ">
+            <!-- Top Part -->
+            <div class="pr-4 pt-3" style=" width: 100%; display: flex; justify-content: flex-end;"><img
+                    src="assets/img/TIW-logo.png" alt="logo" width="100px" height="auto"></div>
+            <div class="p-2  w-full">
+                <div class="grid justify-content-center">
+                    <div class="xl:col-10">
+                        <div>
+                            <h1 class="block mx-auto mb-4 text-6xl"><span >ALGO </span> <span
+                                    class="text-teal-900">DESIGN</span> </h1>
+                        </div>
+                        <!-- <p class="text-lg">Welcome to Algo Design,</p> -->
+                        <p class="text-lg mb-3">Register here</p>
+                        <p class="text-lg">Have account? <a class="text-teal-900 underline cursor-pointer font-bold"
+                                routerLink="/auth/login">Sign-in</a></p>
+                        <form [formGroup]="registerForm" (ngSubmit)="register()">
+
+                            <div class="flex align-items-center justify-content-start full-width my-5 gap-2">
+
+                                <div>
+                                    <div class="font-medium text-gray-600 text-lg mb-2 block">Name</div>
+                                    <input id="userName" type="text" pInputText class="w-full mb-4 text-lg "
+                                        placeholder="Enter Name" formControlName="name">
+                                </div>
+
+                                <div>
+                                    <div class="font-medium text-gray-600 text-lg mb-2 block">Username</div>
+                                    <input id="email4" type="text" pInputText class="w-full mb-4 text-lg "
+                                        placeholder="Enter username(e.g user@abc.com)" formControlName="email">
+
+                                </div>
+                                <div>
+                                    <div class="font-medium text-gray-600 text-lg mb-2 block">Password</div>
+                                    <p-password [toggleMask]="true" [feedback]="false"
+                                        styleClass="p-input-icon-right w-full mb-4" formControlName="password"
+                                        placeholder="Enter password"></p-password>
+
+                                </div>
+                            </div>
+
+
+                            <div class="flex align-items-center justify-content-end">
+                                <button pButton pRipple label="Register" class="font-medium text-xl" type="submit"
+                                    [disabled]="!registerForm.valid"></button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <!-- Top Part -->
+
+            <!-- Bottom Part -->
+            <app-login-footer></app-login-footer>
+            <!-- Bottom Part -->
+
+        </div>
+    </div>
+</div>
+<p-toast></p-toast>

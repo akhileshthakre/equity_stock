@@ -13,12 +13,16 @@ import { CarouselModule } from 'primeng/carousel';
 import { StyleClassModule } from 'primeng/styleclass';
 import { RippleModule } from 'primeng/ripple';
 import { ToastModule } from 'primeng/toast';
+import { SignUpComponent } from './components/sign-up/sign-up.component';
+import { MessageService } from 'primeng/api';
+import { AuthGuardService } from '../shared/guards/auth-guard.service';
 
 @NgModule({
   declarations: [
     LoginComponent,
     LoginBannerComponent,
-    LoginFooterComponent
+    LoginFooterComponent,
+    SignUpComponent
   ],
   imports: [
     CommonModule,
@@ -31,6 +35,7 @@ import { ToastModule } from 'primeng/toast';
     DividerModule,
     CarouselModule,
     StyleClassModule,ToastModule
-  ]
+  ],
+  providers:[MessageService , AuthGuardService]
 })
 export class AuthModule { }
