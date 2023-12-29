@@ -153,8 +153,8 @@ export class HomeComponent implements OnInit {
             delete val.id;
             delete val.createdAt;
             delete val.updatedAt;
-            val.fallInStock = Number(val.fallInStock).toFixed(2) + " %";
-            val.limitLevel = Number(val.limitLevel).toFixed(2) + " %   ";
+            val.fallInStock = Number(val.fallInStock * 100).toFixed(1) + "%";
+            val.limitLevel = Number(val.limitLevel * 100).toFixed(1) + "%   ";
             val.hldDay = Number(val.hldDay)
         })
     }
@@ -251,12 +251,12 @@ export class HomeComponent implements OnInit {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
             delete item.numberOfDownMoves;
-            item.fallInStock = Number(item.fallInStock).toFixed(2) + " %";
-            item.limitLevel = Number(item.limitLevel).toFixed(2) + " %   ";
+            item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+            item.limitLevel = Number(item.limitLevel * 100).toFixed(1) + "%   ";
             item.hldDay = Number(item.hldDay);
-            item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
-            item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
-            item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+            item.totalRetSum = Number(item.totalRetSum).toFixed(2) + "%   ";
+            item.avgGain = Number(item.avgGain).toFixed(2) + "%   ";
+            item.winPercent = Number(item.winPercent).toFixed(2) + "%   ";
         });
     }
     prevPage() {
