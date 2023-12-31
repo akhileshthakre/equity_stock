@@ -84,7 +84,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
-    const bp = calculateBP(stock, prevStock, index, testValue);
+    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
     const prevBp = prevStock ? prevStock.BP : null;
 
     if (bp === "") {
@@ -99,7 +99,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.posInitial? stock.posInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
     const constantN2 = constantTGT; //change it with the N2 of the sheet
@@ -144,7 +144,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const slHit = stock.SLHit ? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue);
     const high = stock.high;
     const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue);
-    const posInitial = stock.posInitial ? stock.posInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
   
     if (open === "") {
@@ -163,7 +163,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.posInitial ? stock.posInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const prevHldDays = prevStock ? prevStock.HLDDay : null;;
 
@@ -186,7 +186,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.posInitial ? stock.posInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
     const prevCarry = prevStock ? prevStock.Carry : null
     const slHit = stock.SLHit? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue);
     const tgtHit = stock.TGTHit ? stock.TGTHit : calculateTGTHit(stock, prevStock, index, testValue);
@@ -209,7 +209,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.posInitial ? stock.posInitial : calculatePosInitial(stock, prevStock, index,testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index,testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
     const constantM2 = constantSloss; //Change with the actual M2 from the sheet
@@ -268,7 +268,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
   
     if (open === "") {
       return "";
-    } else {
+    } else if(prevCarry || posInitial) {
       if ((prevCarry === 1 || posInitial === 1) && sp === "") {
         return 1;
       } else {
@@ -286,8 +286,10 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     if(sp === "" || sp === null) {
         return null
     }
-    const ret = isNaN(sp / bp - 1) ? '' : sp / bp - 1;
-    return ret;
+    const ret = isNaN(sp / bp - 1) ? '' : (sp / bp - 1);
+    const test = ret * 100
+    const rounfOff = Math.round(test * 10) / 10;
+    return rounfOff;
   };
 
   const  roundToDecimalPlaces = (number)  => {
@@ -314,7 +316,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
       const hrefPoint = calculateHRefPoints(stock, prevStock, index, testValue);
       const declineInRP = calculateDeclineFromRP(stock, prevStock, index, testValue);
       const bp = calculateBP(stock, prevStock, index, testValue);
-      const dPosInitial = calculatePosInitial(stock, prevStock, index, testValue);
+      const posInitial = calculatePosInitial(stock, prevStock, index, testValue);
       const tgt = calculateTGT(stock, prevStock, index, testValue);
       const slHit = calculateSLHit(stock, prevStock, index, testValue);
       const tgtHit = calculateTGTHit(stock, prevStock, index, testValue);
@@ -330,7 +332,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         HrefPoint: hrefPoint,
         declineInRP: declineInRP,
         BP: bp,
-        DPosInitial: dPosInitial,
+        DPosInitial: posInitial,
         TGT: tgt,
         SLHit: slHit,
         TGTHit: tgtHit,
@@ -347,7 +349,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         HrefPoint: hrefPoint,
         declineInRP: declineInRP,
         BP: bp,
-        DPosInitial: dPosInitial,
+        DPosInitial: posInitial,
         TGT: tgt,
         SLHit: slHit,
         TGTHit: tgtHit,
