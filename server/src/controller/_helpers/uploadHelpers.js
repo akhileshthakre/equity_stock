@@ -3,13 +3,22 @@ const Stock = db.stocks;
 const TestValue = db.testValues
 
 const convertSheetColumnsToDatabase = (sheetColumns) => {
-    const columnMapping = {
-      'fall in stock': 'fallInStock',
-      'limit level': 'limitLevel',
-      'hld days': 'hldDay',
-    };
-    return sheetColumns.map((sheetColumn) => columnMapping[sheetColumn.toLowerCase()]);
+  const columnMapping = {
+    'fall in stock': 'fallInStock',
+    'limit level': 'limitLevel',
+    'hld days': 'hldDay',
   };
+
+  const normalizedColumns = sheetColumns.map((sheetColumn) => sheetColumn.toLowerCase());
+
+  if (normalizedColumns.includes('hld day')) {
+    const index = normalizedColumns.indexOf('hld day');
+    normalizedColumns[index] = 'hld days';
+  }
+
+  return normalizedColumns.map((sheetColumn) => columnMapping[sheetColumn]);
+};
+
 
 // Function to process data from the Excel file and update the RDS database
 const processAndSyncData = async (worksheet, fileType, fileName) => {
@@ -50,7 +59,7 @@ try{
         if (rowData.every(cell => cell === undefined || cell === null)) {
           continue;
         }
-        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns: columns, rowData, originalFileName ? originalFileName[0] : '');
+        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns : columns, rowData, originalFileName ? originalFileName[0] : '');
         // Skip rows with unexpected values
         if (rowObject === null) {
           continue;
