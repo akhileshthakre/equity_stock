@@ -5359,7 +5359,7 @@ p-treeselect.p-treeselect-clearable .p-treeselect-clear-icon {
 }
 
 .p-fileupload .p-fileupload-row > div {
-  padding: 1rem 1rem;
+  padding: 5px;
 }
 
 .p-fileupload.p-fileupload-advanced .p-message {

@@ -46,4 +46,9 @@ ul {
   font-size: 23px;
   text-transform: uppercase;
   font-weight: bolder;
+}
+
+.font-size-medium {
+  font-size: medium;
+  font-weight: 700;
 }/*# sourceMappingURL=header.component.css.map */

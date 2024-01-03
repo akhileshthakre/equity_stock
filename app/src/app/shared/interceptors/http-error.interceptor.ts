@@ -27,6 +27,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
             } else {
               errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
             }
+            localStorage.clear();
             return throwError(errorMessage);
           })
         )

@@ -2,9 +2,9 @@
 <div class="header-bg px-3 py-1 flex justify-content-between">
   <div class="flex align-items-center">
 
-    <div class="logo-text"> <span>  Algo </span><span class="text-yellow-400">Design</span>
+    <div class="logo-text"> <span> Algo </span><span class="text-yellow-400">Design</span>
     </div> &nbsp;&nbsp;&nbsp;
-    <div class="logo bg-white  px-2">
+    <div class="logo bg-white px-2">
       <img src="assets/img/logo-transp.png" alt="logo" width="80px" height="auto">
 
     </div>
@@ -23,33 +23,37 @@
     </div> -->
 
 
-  <div class="flex justify-content-end lg:w-1 w-5">
-    <ul class="list-none p-0 m-0 flex align-items-center z-1">
-      <li class="relative">
-        <a pRipple class="cursor-pointer" pStyleClass="@next" enterClass="hidden" enterActiveClass="scalein"
-          leaveToClass="hidden" leaveActiveClass="fadeout" [hideOnOutsideClick]="true">
-          <p-avatar label="BS" pBadge value="0"></p-avatar>
-        </a>
-        <div class="bg-white border-round shadow-2 absolute right-0 hidden origin-top w-14rem text-sm">
-          <div class="p-2">
-            <div class="flex align-items-center justify-content-between mb-2">
-              <div class="font-bold mr-2">John Dew</div>
-              <div class="bg-blue-50 border-primary border-1 px-2 py-1 font-bold border-round text-primary text-xxs">
-                ADMIN</div>
+  <div class="flex align-items-center gap-4 pr-2" style="justify-content: space-between;" >
+    <div ><span class="text-yellow-400 hover:text-white font-size-medium cursor-pointer" (click)="goToHome()">HOME</span></div>
+    <div ><span class="text-yellow-400 hover:text-white font-size-medium cursor-pointer" (click)="goToExecution()">EXECUTION</span></div>
+    <div>
+      <ul class="list-none p-0 m-0 flex align-items-center z-1">
+        <li class="relative">
+          <a pRipple class="cursor-pointer" pStyleClass="@next" enterClass="hidden" enterActiveClass="scalein"
+            leaveToClass="hidden" leaveActiveClass="fadeout" [hideOnOutsideClick]="true">
+            <p-avatar label="BS" pBadge value="0"></p-avatar>
+          </a>
+          <div class="bg-white border-round shadow-2 z-1 absolute right-0 hidden origin-top w-14rem text-sm">
+            <div class="p-2">
+              <div class="flex align-items-center justify-content-between mb-2">
+                <div class="font-bold mr-2">John Dew</div>
+                <div class="bg-blue-50 border-primary border-1 px-2 py-1 font-bold border-round text-primary text-xxs">
+                  ADMIN</div>
+              </div>
+              <div class="flex align-items-center">
+                <i class="pi pi-phone mr-2"></i>
+                <span>+91 9899 000987</span>
+              </div>
             </div>
-            <div class="flex align-items-center">
-              <i class="pi pi-phone mr-2"></i>
-              <span>+91 9899 000987</span>
+            <p-divider styleClass="my-0"></p-divider>
+            <div class="p-2 text-primary flex font-bold cursor-pointer align-items-center" (click)="logOut()">
+              <i class="pi pi-sign-out mr-2"></i>
+              <span>Logout</span>
             </div>
           </div>
-          <p-divider styleClass="my-0"></p-divider>
-          <div class="p-2 text-primary flex font-bold cursor-pointer align-items-center" (click)="logOut()">
-            <i class="pi pi-sign-out mr-2"></i>
-            <span>Logout</span>
-          </div>
-        </div>
-      </li>
+        </li>
 
-    </ul>
+      </ul>
+    </div>
   </div>
 </div>
