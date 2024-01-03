@@ -13,4 +13,10 @@ export class HeaderComponent {
     localStorage.clear()
     this._route.navigate(['/auth/login'])
   }
+  goToExecution(){ 
+    this._route.navigate(['/dashboard/execution'])
+  }
+  goToHome(){ 
+    this._route.navigate(['/dashboard/home'])
+  }
 }

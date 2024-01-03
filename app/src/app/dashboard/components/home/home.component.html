@@ -4,7 +4,7 @@
       <h2 class="pt-1 pl-2 mb-1">Upload Price</h2>
     </ng-template>
     <p-toast></p-toast>
-    <p-fileUpload name="demo[]" #fileUpload (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"
+    <p-fileUpload name="demo[]" #fileUpload [multiple]="true" (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"
       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <ng-template pTemplate="content">
         <ul *ngIf="uploadedFiles.length">
@@ -18,7 +18,7 @@
       <h2 class="pt-1 pl-2 mb-1">Upload Test Values</h2>
     </ng-template>
     <p-toast></p-toast>
-    <p-fileUpload name="demo[]" #fileUploadForTestValues
+    <p-fileUpload name="demo[]" #fileUploadForTestValues  [multiple]="true"
       (uploadHandler)="onUploadTestValues($event,fileUploadForTestValues)" [customUpload]="true"
       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <ng-template pTemplate="content">
@@ -116,7 +116,8 @@
     </p-card>
   </div>
 </div>
-<div class="out-put main" *ngIf="showOutPutTable && outputList.length">
+<!-- showOutPutTable &&  -->
+<div class="out-put main" *ngIf="outputList.length">
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">
