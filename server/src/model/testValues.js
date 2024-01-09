@@ -13,6 +13,10 @@ const TestValue = (sequelize) => sequelize.define('testValue', {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: true,
   },
+  userId: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
 });
 
 module.exports = TestValue;

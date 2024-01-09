@@ -2,6 +2,7 @@ const ExcelJS = require('exceljs');
 const processAndSyncData = require('./_helpers/uploadHelpers');
 
 const uploadFileAndSyncDatabase = async (req, file, res) => {
+    const userId = req.user.userId
     const path = req.path.split('/');
     let fileCount
     const filesName = []
@@ -19,7 +20,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
                     filesName.push(value.originalname)
                     await workbook.xlsx.load(value.buffer);
                     const worksheet = workbook.worksheets[0];
-                    await processAndSyncData(worksheet, 'stockFile', value.originalname);
+                    await processAndSyncData(userId, worksheet, 'stockFile', value.originalname);
                 }
                 res.send({
                     data: {fileCount, filesName},
@@ -32,7 +33,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
         }else {
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.worksheets[0];
-            await processAndSyncData(worksheet, 'testFile');
+            await processAndSyncData(userId, worksheet, 'testFile', 'testDataFile');
             res.status(200).json({ message: 'File uploaded and database updated successfully' });
         }
 

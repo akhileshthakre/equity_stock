@@ -15,7 +15,7 @@ const spareSecretKey = generateNewSecretKey();
 const generateToken = (userId, username) => {
   try {
     const token = jwt.sign({ userId, username }, process.env.JWT_SECRET_KEY || spareSecretKey, {
-      expiresIn: '2h',
+      expiresIn: '3h',
     });
     return token;
   } catch (error) {

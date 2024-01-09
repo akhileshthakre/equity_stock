@@ -3,8 +3,11 @@ const TestValue = db.testValues
 
 const TestValuesController = {
   getAllTestValues: async (req, res) => {
+    const userId = req.user.userId
     try {
-      const testValues = await TestValue.findAll();
+      const testValues = await TestValue.findAll({
+        where: {userId},
+      });
       res.send({
         data: [...testValues]
       });
@@ -14,9 +17,10 @@ const TestValuesController = {
   },
 
   deleteAllTestValues: async (req, res) => {
+    const userId = req.user.userId
     try {
         await TestValue.destroy({
-          where: {},
+          where: {userId},
         });
         res.status(204).send({
             data: []

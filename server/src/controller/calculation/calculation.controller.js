@@ -40,26 +40,28 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
 
 const CalculationService = {
   fetchData: async (req, res) => {
+    const userId = req.user.userId
     const { page = 1, pageSize = 100, downloadAll = false, slossPercent, tgPercent, tsPercent, stockId  } = req.body;
     let stocks, testValues, filteredTestValues, results;
 
     try {
       if (downloadAll) {
-        [stocks, testValues] = await Promise.all([Stock.findAll(), TestValue.findAll()]);
+        [stocks, testValues] = await Promise.all([Stock.findAll({where: {userId}}), TestValue.findAll({where: {userId}})]);
       } else if(stockId){
         const offset = (page - 1) * pageSize;
-        testValues = await TestValue.findAll({ offset, limit: pageSize });
+        testValues = await TestValue.findAll({ where: {userId}, offset, limit: pageSize });
         stocks = await Stock.findAll({
           where: {
             name: stockId,
+            userId: userId
           },
         });
       }else {
         const offset = (page - 1) * pageSize;
-        testValues = await TestValue.findAll({ offset, limit: pageSize });
-        stocks = await Stock.findAll();
+        testValues = await TestValue.findAll({ where: {userId}, offset, limit: pageSize });
+        stocks = await Stock.findAll({where: {userId}});
       }
-      const whereClause = stockId ? { name: stockId }: null
+      const whereClause = stockId ? { name: stockId , userId: userId}: {userId: userId}
       const uniqueStocks = await Stock.findAll({
         where: {...whereClause},
         attributes: ['name'],

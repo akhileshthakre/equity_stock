@@ -2,7 +2,7 @@ const db = require('../../model');
 const Stock = db.stocks;
 const TestValue = db.testValues
 
-const convertSheetColumnsToDatabase = (sheetColumns) => {
+const convertSheetColumnsToDatabase = (sheetColumns, userId) => {
   const columnMapping = {
     'fall in stock': 'fallInStock',
     'limit level': 'limitLevel',
@@ -16,12 +16,19 @@ const convertSheetColumnsToDatabase = (sheetColumns) => {
     normalizedColumns[index] = 'hld days';
   }
 
-  return normalizedColumns.map((sheetColumn) => columnMapping[sheetColumn]);
+  const columnsWithUserId = normalizedColumns.map((sheetColumn) => columnMapping[sheetColumn]);
+
+  if (userId && !columnsWithUserId.includes('userId')) {
+    columnsWithUserId.push('userId');
+  }
+
+  return columnsWithUserId;
 };
 
 
+
 // Function to process data from the Excel file and update the RDS database
-const processAndSyncData = async (worksheet, fileType, fileName) => {
+const processAndSyncData = async (userId, worksheet, fileType, fileName) => {
 let databaseColumns
 let originalFileName
 if(fileType === "stockFile") {
@@ -32,7 +39,7 @@ try{
     const columns = getColumnsFromHeaderRow(worksheet.getRow(1).values);
 
     if(fileType === 'testFile') {
-     databaseColumns = convertSheetColumnsToDatabase(columns);
+     databaseColumns = convertSheetColumnsToDatabase(columns, userId);
     }
 
     if(fileType === 'stockFile') {
@@ -59,7 +66,7 @@ try{
         if (rowData.every(cell => cell === undefined || cell === null)) {
           continue;
         }
-        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns : columns, rowData, originalFileName ? originalFileName[0] : '');
+        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns : columns, rowData, originalFileName ? originalFileName[0] : '', userId);
         // Skip rows with unexpected values
         if (rowObject === null) {
           continue;
@@ -69,14 +76,14 @@ try{
 
    switch(fileType) {
     case 'stockFile':
-        await Stock.bulkCreate(rows, { updateOnDuplicate: Object.keys(rows[0]) });
+        await Stock.bulkCreate(rows, {updateOnDuplicate: Object.keys(rows[0]) });
         break
     case 'testFile':
-        await TestValue.bulkCreate(rows, {
-          fields: databaseColumns,
-          updateOnDuplicate: databaseColumns,
-        });
-        break
+      await TestValue.bulkCreate(rows, {
+        fields: databaseColumns,
+        updateOnDuplicate: databaseColumns,
+      });
+      break;
    }
    console.log('Bulk insert completed.');
 } catch (error) {
@@ -89,7 +96,7 @@ try{
     return headerRow.filter(column => column !== undefined).map((column) => column.toString().toLowerCase());
   };
   
-  const mapRowToObject = (columns, rowData, sheetName) => {
+  const mapRowToObject = (columns, rowData, sheetName, userId) => {
     const data = rowData.filter(row => row !== undefined).map((row) => row);
     const rowObject = {};
   
@@ -103,6 +110,8 @@ try{
         rowObject[column] = data[index];
       }
     });
+
+    rowObject.userId = userId
 
     return rowObject;
   };
