@@ -30,5 +30,7 @@ db.user = require('./user')(sequelize, Sequelize);
 db.stocks = require('./stock')(sequelize, Sequelize);
 db.testValues = require('./testValues')(sequelize, Sequelize);
 
+db.stocks.belongsTo(db.user, { foreignKey: 'userId' });
+db.testValues.belongsTo(db.user, { foreignKey: 'userId' });
 
 module.exports = db;

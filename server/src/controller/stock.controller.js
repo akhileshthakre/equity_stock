@@ -3,8 +3,11 @@ const Stock = db.stocks
 
 const StockController = {
   getAllStock: async (req, res) => {
+    const userId = req.user.userId; 
     try {
-      const stocks = await Stock.findAll();
+      const stocks = await Stock.findAll({
+        where: { userId },
+      });
       res.send({
         data: [...stocks]
       });
@@ -14,9 +17,10 @@ const StockController = {
   },
 
   deleteAllStocks: async (req, res) => {
+    const userId = req.user.userId; 
     try {
         await Stock.destroy({
-          where: {},
+          where: { userId },
         });
         res.status(204).send({
             data: []
