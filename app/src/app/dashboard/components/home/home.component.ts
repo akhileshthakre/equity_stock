@@ -6,6 +6,11 @@ import { StocksApiService } from 'src/app/shared/apis/stocks.service';
 import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
 import * as XLSX from 'xlsx';
 
+interface UploadEvent {
+    // originalEvent: Event;
+    files: File[];
+}
+
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
@@ -19,15 +24,18 @@ export class HomeComponent implements OnInit {
     testHeadersMapping: string[] = ['fallInStock', 'limitLevel', 'hldDay']
     opHeaders: string[] = ['Stock name ', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %']
     opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent']
-    pageNumber: number = 0
+    pageNumber: number = 0;
+    fileCount: number = 0
     data: any;
     showOutPutTable: boolean = false
     options: any;
     uploadedFiles: any[] = [];
     uploadedTestValues: any[] = [];
     products: any[] = []
+    stockData: any[] = []
     testList: any[] = []
     outputList: any[] = []
+    outputData: any[] = []
     backTestForm: FormGroup = this.formBuilder.group({
         slossPercent: [],
         tgPercent: [],
@@ -37,8 +45,8 @@ export class HomeComponent implements OnInit {
     constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
 
     ngOnInit() {
-        this.getStocksFile();
-        this.getTestValuesFile()
+        //this.getStocksFile();
+        //this.getTestValuesFile()
     }
 
     get slossPercentControl() {
@@ -51,21 +59,37 @@ export class HomeComponent implements OnInit {
         return this.backTestForm.get('tsPercent')
     }
 
-    onUpload(event: any, fileUpload: any) {
+    onUpload(event: UploadEvent, fileUpload: any) {
         this.spinnerService.showSpinner(true)
+        console.log(event)
         for (let file of event.files) {
             this.uploadedFiles.push(file);
         }
         this.products = []
         this._stockService.deleteAllStockList().pipe(switchMap((val) =>
             this._stockService.uploadStockXlsxFile(this.uploadedFiles)
-        )).pipe(switchMap(val => this._stockService.getAllStockInfo()))
+        ))
+            //.pipe(switchMap(val => this._stockService.getAllStockInfo()))
             .subscribe({
                 next: (res: any) => {
                     this.spinnerService.showSpinner(false)
                     if (res) {
                         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded' });
-                        this.products = res.data
+                        let data = res.data
+                        this.fileCount = res.data?.fileCount ?? 0
+                        if (data.fileCount > 1) {
+                            let files = data.filesName
+                            files.forEach((element: string) => {
+                                const obj = {
+                                    date: new Date(),
+                                    name: element
+                                }
+                                this.stockData.push(obj);
+                            });
+                        } else {
+                            this.getStocksFile();
+                            this.stockData = []
+                        }
                         this.formatProducts()
                         while (this.uploadedFiles.length) {
                             this.uploadedFiles.pop();
@@ -85,7 +109,7 @@ export class HomeComponent implements OnInit {
             })
     }
 
-    onUploadTestValues(event: any, fileUploadForTestValues: any) {
+    onUploadTestValues(event: UploadEvent, fileUploadForTestValues: any) {
         this.spinnerService.showSpinner(true)
         for (let file of event.files) {
             this.uploadedTestValues.push(file);
@@ -153,8 +177,8 @@ export class HomeComponent implements OnInit {
             delete val.id;
             delete val.createdAt;
             delete val.updatedAt;
-            val.fallInStock = Number(val.fallInStock).toFixed(2) + " %";
-            val.limitLevel = Number(val.limitLevel).toFixed(2) + " %   ";
+            val.fallInStock = Number(val.fallInStock * 100).toFixed(1) + "%";
+            val.limitLevel = Number(val.limitLevel * 100).toFixed(2) + " %   ";
             val.hldDay = Number(val.hldDay)
         })
     }
@@ -175,11 +199,6 @@ export class HomeComponent implements OnInit {
     }
 
     exportToExcl(type: number, fileName: string, data: any, headers: string[], mappingHeaders: string[]) {
-        // const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(itemList, { header: headers });
-        // const wb: XLSX.WorkBook = XLSX.utils.book_new();
-        // XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        // XLSX.writeFile(wb, fileName);
-
         const mappedData = data.map((item: any) => {
             const mappedItem: any = {};
             mappingHeaders.forEach((fieldMap, index) => {
@@ -193,6 +212,33 @@ export class HomeComponent implements OnInit {
         XLSX.writeFile(workbook, `${fileName}`);
 
         this.spinnerService.showSpinner(false)
+    }
+    downloadOPExcl() {
+        this.exportToExcl(1, 'output.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+    }
+
+    stockExceldownload(index: number) {
+        this.spinnerService.showSpinner(true)
+        let stock = this.outputData.find(stock => stock.index == index)
+        if (stock) {
+            const obj = {
+                downloadAll: true,
+                stockId: stock.name
+            }
+            this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
+                this.spinnerService.showSpinner(false)
+                let list: any[] = [].concat(...resp.data)                
+                list.map((item: any) => {
+                    item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+                    item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
+                    item.hldDay = Number(item.hldDay);
+                    item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
+                    item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
+                    item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+                });
+                this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
+            })
+        }
     }
 
     downloadInExcl() {
@@ -219,24 +265,62 @@ export class HomeComponent implements OnInit {
     }
 
     calOutPut(obj: any, type?: number) {
+        this.outputData = []
+        this.outputList = []
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
             if (resp) {
-                this.outputList = resp.data
+                console.log(resp)
+                if (this.fileCount < 2) {
+                    this.outputList = [].concat(...resp.data)
+
+                } else {
+                    let list = [].concat(...resp.data)
+                    const groupedData: any = {};
+                    list.forEach((item: any) => {
+                        const stockName = item.nameOfStock;
+                        if (!groupedData[stockName]) {
+                            groupedData[stockName] = [];
+                        }
+                        groupedData[stockName].push(item);
+                    });
+                    setTimeout(() => {
+                        let index = 0
+                        Object.entries(groupedData).forEach(([key, value]) => {
+                            (value as Array<any>).map((item: any) => {
+                                item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+                                item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
+                                item.hldDay = Number(item.hldDay);
+                                item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
+                                item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
+                                item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+                            });
+                            console.log(value)
+                            let data = {
+                                name: key,
+                                opData: value,
+                                index: ++index
+                            }
+                            this.outputData.push(data)
+                        });
+                    }, 0);
+                }
+
                 this.formatOPList()
-                if (type == 3) this.exportToExcl(type, 'out_put.xlsx', resp.data, this.opHeaders, this.opHeadersMapping)
+                if (type == 3) this.exportToExcl(type, 'out_put.xlsx', [].concat(...resp.data), this.opHeaders, this.opHeadersMapping)
+                //else if (type == 4) this.exportToExcl(type, obj.stockId + '.xlsx', [].concat(...resp.data), this.opHeaders, this.opHeadersMapping)
                 this.showOutPutTable = true
 
-                while (this.uploadedTestValues.length) {
-                    this.uploadedTestValues.pop();
-                }
-                while (this.uploadedFiles.length) {
-                    this.uploadedFiles.pop();
-                }
-                this.testList = []
-                this.products = []
+                // while (this.uploadedTestValues.length) {
+                //     this.uploadedTestValues.pop();
+                // }
+                // while (this.uploadedFiles.length) {
+                //     this.uploadedFiles.pop();
+                // }
+                // this.testList = []
+                // this.products = []
 
             } else {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
@@ -251,14 +335,15 @@ export class HomeComponent implements OnInit {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
             delete item.numberOfDownMoves;
-            item.fallInStock = Number(item.fallInStock).toFixed(2) + " %";
-            item.limitLevel = Number(item.limitLevel).toFixed(2) + " %   ";
+            item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+            item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
             item.hldDay = Number(item.hldDay);
             item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
             item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
             item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
         });
     }
+
     prevPage() {
         if (this.pageNumber > 1) {
             --this.pageNumber;
