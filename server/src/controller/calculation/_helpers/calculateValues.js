@@ -292,6 +292,41 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     return rounfOff;
   };
 
+  const calculateND = (stock, prevStock, index, testValue) => {
+    if(index === 0 || index === 1 || index === 2 ) {
+      return null
+    }
+    const tradeClose = stock.TradeClose ? stock.TradeClose : calculateTradeClose(stock, prevStock, index, testValue);
+    const sp = stock.SP? stock.SP : calculateSP(stock, prevStock, index, testValue);
+    const hrefPoint = stock.HrefPoint ? stock.HrefPoint : calculateHRefPoints(stock, prevStock, index, testValue);
+    const high = stock.high
+
+    if (tradeClose === 1) {
+        return sp;
+    } else {
+        if (hrefPoint > high) {
+            return hrefPoint;
+        } else {
+            return high
+        }
+    }
+  }
+
+  const calculateLP = (stock, prevStock, index, testValue, nd, carry) => {
+    if(index === 0 || index === 1 || index === 2 ) {
+      return null
+    }
+    const fallInStock = testValue.fallInStock / 100
+    const limitLevel = testValue.limitLevel / 100
+
+    if (carry === 0) {
+        return nd * (1 + fallInStock - limitLevel);
+    } else {
+        return "X";
+    }
+
+  }
+
   const  roundToDecimalPlaces = (number)  => {
     let factor = Math.pow(10, 2);
     return Math.round(number * factor) / factor;
@@ -326,7 +361,9 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
       const carry = calculateCarry(stock, prevStock, index, sp, testValue);
       const sloss = calculateSloss(stock, prevStock, index, testValue);
       const ret = calculateRet(stock, prevStock, index, testValue);
-  
+      const nd = calculateND(stock, prevStock, index, testValue);
+      const lp = calculateLP(stock, prevStock, index, testValue, nd, carry);
+
       prevStock = {
         ...stock,
         HrefPoint: hrefPoint,
@@ -342,6 +379,8 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         Carry: carry,
         Sloss: sloss,
         Ret: ret,
+        ND: nd,
+        LP: lp,
       };
 
       return {
@@ -359,6 +398,8 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         Carry: carry,
         Sloss: sloss,
         Ret: ret,
+        ND: nd,
+        LP: lp,
       };
     });
   

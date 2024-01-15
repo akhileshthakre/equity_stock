@@ -12,8 +12,12 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
         }
 
         const workbook = new ExcelJS.Workbook();
-        const foundValue = path.find(item => item === 'stockFile');
-        if(foundValue) {
+        const stockFile = path.find(item => item === 'stockFile');
+        const testFile = path.find(item => item === 'testFile');
+        const executionFile = path.find(item => item === 'executionFile');
+
+
+        if(stockFile) {
             try {
                 fileCount = file.length
                 for (const value of file) {
@@ -30,10 +34,15 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
                 return res.status(500).json({ message: 'Internal Server Error' });
             }
 
-        }else {
+        }else if(testFile) {
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.worksheets[0];
             await processAndSyncData(userId, worksheet, 'testFile', 'testDataFile');
+            res.status(200).json({ message: 'File uploaded and database updated successfully' });
+        }else if(executionFile) {
+            await workbook.xlsx.load(file.buffer);
+            const worksheet = workbook.worksheets[0];
+            await processAndSyncData(userId, worksheet, 'executionFile', 'executionSheet');
             res.status(200).json({ message: 'File uploaded and database updated successfully' });
         }
 
