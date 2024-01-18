@@ -1,10 +1,11 @@
+const os = require('os');
 const { Worker, isMainThread, parentPort, workerData } = require('worker_threads');
 const db = require('../../model');
 const Stock = db.stocks;
 const TestValue = db.testValues;
 const calculateValues = require('./_helpers/calculateValues');
 
-const NUM_THREADS = 4;
+const NUM_THREADS = os.cpus().length;
 
 const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPercent, stockId) => {
   const resp = await Promise.all(
