@@ -96,6 +96,7 @@ export class HomeComponent implements OnInit {
                         }
                         fileUpload.clear()
                         this.outputList = []
+                        this.outputData = []
                         this.showOutPutTable = true
                     } else {
                         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' })
@@ -178,7 +179,7 @@ export class HomeComponent implements OnInit {
             delete val.createdAt;
             delete val.updatedAt;
             val.fallInStock = Number(val.fallInStock * 100).toFixed(1) + "%";
-            val.limitLevel = Number(val.limitLevel * 100).toFixed(2) + " %   ";
+            val.limitLevel = Number(val.limitLevel * 100).toFixed(2) + "%";
             val.hldDay = Number(val.hldDay)
         })
     }
@@ -217,6 +218,10 @@ export class HomeComponent implements OnInit {
         this.exportToExcl(1, 'output.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
     }
 
+    formatPercentage(val: number) {
+        return Number(val / 100).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 2 });
+    }
+
     stockExceldownload(index: number) {
         this.spinnerService.showSpinner(true)
         let stock = this.outputData.find(stock => stock.index == index)
@@ -227,14 +232,14 @@ export class HomeComponent implements OnInit {
             }
             this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
                 this.spinnerService.showSpinner(false)
-                let list: any[] = [].concat(...resp.data)                
+                let list: any[] = [].concat(...resp.data)
                 list.map((item: any) => {
                     item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
-                    item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
+                    item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + "%";
                     item.hldDay = Number(item.hldDay);
-                    item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
-                    item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
-                    item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+                    item.totalRetSum = Number(item.totalRetSum).toFixed(2) + "%";
+                    item.avgGain = Number(item.avgGain).toFixed(2) + "%";
+                    item.winPercent = Number(item.winPercent).toFixed(2) + "%";
                 });
                 this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
             })
@@ -291,11 +296,11 @@ export class HomeComponent implements OnInit {
                         Object.entries(groupedData).forEach(([key, value]) => {
                             (value as Array<any>).map((item: any) => {
                                 item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
-                                item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
+                                item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + "%";
                                 item.hldDay = Number(item.hldDay);
-                                item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
-                                item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
-                                item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+                                item.totalRetSum = Number(item.totalRetSum).toFixed(2) + "%";
+                                item.avgGain = Number(item.avgGain).toFixed(2) + "%";
+                                item.winPercent = Number(item.winPercent).toFixed(2) + "%";
                             });
                             console.log(value)
                             let data = {
@@ -335,12 +340,13 @@ export class HomeComponent implements OnInit {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
             delete item.numberOfDownMoves;
-            item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
-            item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + " %   ";
+            // item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+            item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
+            item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
             item.hldDay = Number(item.hldDay);
-            item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
-            item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
-            item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+            item.totalRetSum = this.formatPercentage(Number(item.totalRetSum));
+            item.avgGain = this.formatPercentage(Number(item.avgGain));
+            item.winPercent = this.formatPercentage(Number(item.winPercent));
         });
     }
 
