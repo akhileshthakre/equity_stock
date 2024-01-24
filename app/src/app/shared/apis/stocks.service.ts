@@ -27,8 +27,8 @@ export class StocksApiService {
     }), catchError(this.handleError)
     )
   }
-  registerUser(payload: any) { 
-    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.REGISTER}`, payload ).pipe(map((res: any) => {
+  registerUser(payload: any) {
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.REGISTER}`, payload).pipe(map((res: any) => {
       if (res) {
         return res;
       }
@@ -41,8 +41,10 @@ export class StocksApiService {
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
-    formData.append('file', payload[0]);
-    console.log(formData)
+    console.log(payload)
+    for (var x = 0; x < payload.length; x++) {
+      formData.append("file", payload[x]);
+    }
     return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_FILE}`, formData, { params, headers }).pipe(
       map((res: any) => {
         if (res) {
@@ -57,8 +59,9 @@ export class StocksApiService {
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
-    formData.append('file', payload[0]);
-    console.log(formData)
+    // for (var x = 0; x < payload.length; x++) {
+      formData.append("file", payload[0]);
+    // }  
     return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_TEST_FILE}`, formData, { params, headers }).pipe(
       map((res: any) => {
         if (res) {

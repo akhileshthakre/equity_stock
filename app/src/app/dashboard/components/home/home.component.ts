@@ -6,6 +6,11 @@ import { StocksApiService } from 'src/app/shared/apis/stocks.service';
 import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
 import * as XLSX from 'xlsx';
 
+interface UploadEvent {
+    // originalEvent: Event;
+    files: File[];
+}
+
 @Component({
     selector: 'app-home',
     templateUrl: './home.component.html',
@@ -19,15 +24,18 @@ export class HomeComponent implements OnInit {
     testHeadersMapping: string[] = ['fallInStock', 'limitLevel', 'hldDay']
     opHeaders: string[] = ['Stock name ', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %']
     opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent']
-    pageNumber: number = 0
+    pageNumber: number = 0;
+    fileCount: number = 0
     data: any;
     showOutPutTable: boolean = false
     options: any;
     uploadedFiles: any[] = [];
     uploadedTestValues: any[] = [];
     products: any[] = []
+    stockData: any[] = []
     testList: any[] = []
     outputList: any[] = []
+    outputData: any[] = []
     backTestForm: FormGroup = this.formBuilder.group({
         slossPercent: [],
         tgPercent: [],
@@ -37,8 +45,8 @@ export class HomeComponent implements OnInit {
     constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
 
     ngOnInit() {
-        this.getStocksFile();
-        this.getTestValuesFile()
+        //this.getStocksFile();
+        //this.getTestValuesFile()
     }
 
     get slossPercentControl() {
@@ -51,27 +59,44 @@ export class HomeComponent implements OnInit {
         return this.backTestForm.get('tsPercent')
     }
 
-    onUpload(event: any, fileUpload: any) {
+    onUpload(event: UploadEvent, fileUpload: any) {
         this.spinnerService.showSpinner(true)
+        console.log(event)
         for (let file of event.files) {
             this.uploadedFiles.push(file);
         }
         this.products = []
         this._stockService.deleteAllStockList().pipe(switchMap((val) =>
             this._stockService.uploadStockXlsxFile(this.uploadedFiles)
-        )).pipe(switchMap(val => this._stockService.getAllStockInfo()))
+        ))
+            //.pipe(switchMap(val => this._stockService.getAllStockInfo()))
             .subscribe({
                 next: (res: any) => {
                     this.spinnerService.showSpinner(false)
                     if (res) {
                         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded' });
-                        this.products = res.data
+                        let data = res.data
+                        this.fileCount = res.data?.fileCount ?? 0
+                        if (data.fileCount > 1) {
+                            let files = data.filesName
+                            files.forEach((element: string) => {
+                                const obj = {
+                                    date: new Date(),
+                                    name: element
+                                }
+                                this.stockData.push(obj);
+                            });
+                        } else {
+                            this.getStocksFile();
+                            this.stockData = []
+                        }
                         this.formatProducts()
                         while (this.uploadedFiles.length) {
                             this.uploadedFiles.pop();
                         }
                         fileUpload.clear()
                         this.outputList = []
+                        this.outputData = []
                         this.showOutPutTable = true
                     } else {
                         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' })
@@ -85,7 +110,7 @@ export class HomeComponent implements OnInit {
             })
     }
 
-    onUploadTestValues(event: any, fileUploadForTestValues: any) {
+    onUploadTestValues(event: UploadEvent, fileUploadForTestValues: any) {
         this.spinnerService.showSpinner(true)
         for (let file of event.files) {
             this.uploadedTestValues.push(file);
@@ -153,8 +178,8 @@ export class HomeComponent implements OnInit {
             delete val.id;
             delete val.createdAt;
             delete val.updatedAt;
-            val.fallInStock = Number(val.fallInStock).toFixed(2) + " %";
-            val.limitLevel = Number(val.limitLevel).toFixed(2) + " %   ";
+            val.fallInStock = Number(val.fallInStock * 100).toFixed(1) + "%";
+            val.limitLevel = Number(val.limitLevel * 100).toFixed(2) + "%";
             val.hldDay = Number(val.hldDay)
         })
     }
@@ -175,24 +200,70 @@ export class HomeComponent implements OnInit {
     }
 
     exportToExcl(type: number, fileName: string, data: any, headers: string[], mappingHeaders: string[]) {
-        // const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(itemList, { header: headers });
-        // const wb: XLSX.WorkBook = XLSX.utils.book_new();
-        // XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
-        // XLSX.writeFile(wb, fileName);
-
         const mappedData = data.map((item: any) => {
             const mappedItem: any = {};
             mappingHeaders.forEach((fieldMap, index) => {
-                mappedItem[headers[index]] = item[fieldMap];
+                let value = item[fieldMap];
+                if (value !== undefined && value !== null) {
+                    mappedItem[headers[index]] = value;
+                } else {
+                    mappedItem[headers[index]] = null;
+                }
             });
             return mappedItem;
         });
 
         const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
+
+        const percentageColumns: number[] = [1, 2, 5, 6, 7]; // Adjust column indices based on excel columns where % used
+        percentageColumns.forEach(columnIndex => {
+            const range = XLSX.utils.decode_range(worksheet['!ref']!);
+            for (let i = range.s.r + 1; i <= range.e.r; i++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: i, c: columnIndex });
+                const cell = worksheet[cellAddress];
+                if (cell && cell.t === 'n') {
+                    cell.z = '0.00%'; // Setting the percentage format
+                }
+            }
+        });
+
+        // Create a new workbook
         const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         XLSX.writeFile(workbook, `${fileName}`);
 
         this.spinnerService.showSpinner(false)
+    }
+    downloadOPExcl() {
+        this.formatOPList();
+        this.exportToExcl(1, 'output.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+    }
+
+    formatPercentage(val: number) {
+        return Number(val / 100).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 2 });
+    }
+
+    stockExceldownload(index: number) {
+        this.spinnerService.showSpinner(true)
+        let stock = this.outputData.find(stock => stock.index == index)
+        if (stock) {
+            const obj = {
+                downloadAll: true,
+                stockId: stock.name
+            }
+            this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
+                this.spinnerService.showSpinner(false)
+                let list: any[] = [].concat(...resp.data)
+                list.map((item: any) => { 
+                    item.fallInStock = Number(item.fallInStock);
+                    item.limitLevel = Number(item.limitLevel);
+                    item.hldDay = Number(item.hldDay);
+                    item.totalRetSum = Number(item.totalRetSum);
+                    item.avgGain = Number(item.avgGain);
+                    item.winPercent = Number(item.winPercent);
+                });
+                this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
+            })
+        }
     }
 
     downloadInExcl() {
@@ -219,24 +290,56 @@ export class HomeComponent implements OnInit {
     }
 
     calOutPut(obj: any, type?: number) {
+        this.outputData = []
+        this.outputList = []
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
             if (resp) {
-                this.outputList = resp.data
-                this.formatOPList()
-                if (type == 3) this.exportToExcl(type, 'out_put.xlsx', resp.data, this.opHeaders, this.opHeadersMapping)
-                this.showOutPutTable = true
+                console.log(resp)
+                if (this.fileCount < 2) {
+                    this.outputList = [].concat(...resp.data)
 
-                while (this.uploadedTestValues.length) {
-                    this.uploadedTestValues.pop();
+                } else {
+                    let list = [].concat(...resp.data)
+                    const groupedData: any = {};
+                    list.forEach((item: any) => {
+                        const stockName = item.nameOfStock;
+                        if (!groupedData[stockName]) {
+                            groupedData[stockName] = [];
+                        }
+                        groupedData[stockName].push(item);
+                    });
+                    setTimeout(() => {
+                        let index = 0
+                        Object.entries(groupedData).forEach(([key, value]) => {
+                            (value as Array<any>).map((item: any) => {  
+                                item.fallInStock = Number(item.fallInStock);
+                                item.limitLevel = Number(item.limitLevel);
+                                item.hldDay = Number(item.hldDay);
+                                item.totalRetSum = Number(item.totalRetSum);
+                                item.avgGain = Number(item.avgGain);
+                                item.winPercent = Number(item.winPercent);
+                            });
+                            console.log(value)
+                            let data = {
+                                name: key,
+                                opData: value,
+                                index: ++index
+                            }
+                            this.outputData.push(data)
+                        });
+                    }, 0);
                 }
-                while (this.uploadedFiles.length) {
-                    this.uploadedFiles.pop();
+
+
+                if (type == 3) {
+                    this.formatOPList()
+                    this.exportToExcl(type, 'out_put.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
                 }
-                this.testList = []
-                this.products = []
+                this.formatDisplayOPList()
+                this.showOutPutTable = true           
 
             } else {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
@@ -251,14 +354,29 @@ export class HomeComponent implements OnInit {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
             delete item.numberOfDownMoves;
-            item.fallInStock = Number(item.fallInStock).toFixed(2) + " %";
-            item.limitLevel = Number(item.limitLevel).toFixed(2) + " %   ";
+            item.fallInStock = Number(item.fallInStock);
+            item.limitLevel = Number(item.limitLevel);
             item.hldDay = Number(item.hldDay);
-            item.totalRetSum = Number(item.totalRetSum).toFixed(2) + " %   ";
-            item.avgGain = Number(item.avgGain).toFixed(2) + " %   ";
-            item.winPercent = Number(item.winPercent).toFixed(2) + " %   ";
+            item.totalRetSum = Number(item.totalRetSum);
+            item.avgGain = Number(item.avgGain);
+            item.winPercent = Number(item.winPercent);
         });
     }
+
+    //This function should be display on the screen
+    formatDisplayOPList() {
+        this.outputList.map((item) => {
+            delete item.numberOfUpMoves;
+            delete item.numberOfDownMoves; 
+            item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
+            item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
+            item.hldDay = Number(item.hldDay);
+            item.totalRetSum = this.formatPercentage(Number(item.totalRetSum * 100));
+            item.avgGain = this.formatPercentage(Number(item.avgGain * 100));
+            item.winPercent = this.formatPercentage(Number(item.winPercent * 100));
+        });
+    }
+
     prevPage() {
         if (this.pageNumber > 1) {
             --this.pageNumber;

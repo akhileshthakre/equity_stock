@@ -4,8 +4,8 @@
       <h2 class="pt-1 pl-2 mb-1">Upload Price</h2>
     </ng-template>
     <p-toast></p-toast>
-    <p-fileUpload name="demo[]" #fileUpload [multiple]="true" (uploadHandler)="onUpload($event,fileUpload)" [customUpload]="true"
-      accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+    <p-fileUpload name="demo[]" #fileUpload [multiple]="true" (uploadHandler)="onUpload($event,fileUpload)"
+      [customUpload]="true" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <ng-template pTemplate="content">
         <ul *ngIf="uploadedFiles.length">
           <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
@@ -18,7 +18,7 @@
       <h2 class="pt-1 pl-2 mb-1">Upload Test Values</h2>
     </ng-template>
     <p-toast></p-toast>
-    <p-fileUpload name="demo[]" #fileUploadForTestValues  [multiple]="true"
+    <p-fileUpload name="demo[]" #fileUploadForTestValues [multiple]="true"
       (uploadHandler)="onUploadTestValues($event,fileUploadForTestValues)" [customUpload]="true"
       accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
       <ng-template pTemplate="content">
@@ -59,7 +59,7 @@
       <ng-template pTemplate="header">
         <div class="stock-header">
           <h2 class="px-3 pt-3">Stock Table</h2>
-          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(1)"></i>
+          <!-- <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(1)"></i> -->
         </div>
       </ng-template>
       <!-- [tableStyle]="{'min-width': '60rem'}" -->
@@ -87,12 +87,38 @@
       </p-table>
     </p-card>
   </div>
+  <div class="col-6" *ngIf="stockData.length">
+    <p-card styleClass="mt-3">
+      <ng-template pTemplate="header">
+        <div class="stock-header">
+          <h2 class="px-3 pt-3">Stock Table</h2>
+        </div>
+      </ng-template>
+      <p-table [value]="stockData" [paginator]="true" [rows]="5"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [rowsPerPageOptions]="[5,10, 25, 50]">
+        <ng-template pTemplate="header">
+          <tr>
+            <th pSortableColumn="date" style="width:20%">Date <p-sortIcon field="date"></p-sortIcon></th>
+            <th pSortableColumn="name" style="width:20%">Name <p-sortIcon field="name"></p-sortIcon></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product>
+          <tr>
+            <td>{{product.date | date:'dd-MM-yyyy'}}</td>
+            <td>{{product.name}}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </p-card>
+  </div>
+
   <div class="col-6" *ngIf="testList.length">
     <p-card styleClass="mt-3">
       <ng-template pTemplate="header">
         <div class="stock-header">
           <h2 class="px-3 pt-3">Test Values</h2>
-          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(2)"></i>
+          <!-- <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(2)"></i> -->
         </div>
       </ng-template>
       <p-table [value]="testList" [paginator]="true" [rows]="5"
@@ -107,7 +133,7 @@
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
-            <td>{{product.fallInStock  }}</td>
+            <td>{{product.fallInStock }}</td>
             <td>{{product.limitLevel }} </td>
             <td>{{product.hldDay }}</td>
           </tr>
@@ -160,48 +186,38 @@
       <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
           (click)="nextPage()"></i></div>
     </div>
-
-
-    <!-- <p-table [value]="outputList" styleClass="p-datatable-gridlines">
-      <ng-template pTemplate="caption">
-     
-        <div class="stock-header">
-          <h2 class="px-3 pt-3">Output Table</h2>
-          <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="exportToExcl(3)"></i>
-        </div>
-      </ng-template>
+  </p-card>
+</div>
+<div class="out-put main" style="max-width: 60%;" *ngIf="outputData.length">
+  <p-card styleClass="mt-3">
+    <ng-template pTemplate="header">
+      <div class="stock-header">
+        <h2 class="px-3 pt-3">Output Table</h2>
+        <!-- <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="downloadInExcl()"></i> -->
+      </div>
+    </ng-template>
+    <p-table [value]="outputData" [paginator]="true" [rows]="5"
+      currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+      [rowsPerPageOptions]="[5,10, 25, 50]">
       <ng-template pTemplate="header">
         <tr>
-          <th>Name</th>
-          <th>Fall in Stock</th>
-          <th>LimitLevel</th>
-          <th>HoldingDay</th>
-          <th>#OfDays</th>
-          <th>TotalSum</th>
-          <th>AvgGain</th>
-          <th>Win%</th>
+          <th pSortableColumn="name"> Name <p-sortIcon field="name"></p-sortIcon></th>
+          <th pSortableColumn="index">Download <p-sortIcon field="index"></p-sortIcon></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-product>
         <tr>
           <td>{{product.name}}</td>
-          <td>{{product.fallInStock | number}}</td>
-          <td>{{product.limitLevel | number}}</td>
-          <td>{{product.hldDay}}</td>
-          <td>{{product.totalDays}}</td>
-          <td>{{product.totalRetSum | number}}</td>
-          <td>{{product.avgGain | number}}</td>
-          <td>{{product.winPercent | number}}</td>
+          <td><i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="stockExceldownload(product.index)"></i></td>
         </tr>
       </ng-template>
-      <ng-template pTemplate="summary">
-        <div>jhkshfdsf</div>
-      </ng-template>
-    </p-table> -->
-
-
-
-
+    </p-table>
+    <!-- <div class="flex justify-content-between mb-2">
+      <div><i class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" tooltipPosition="top" pTooltip="Prev"
+          (click)="prevPage()"></i></div>
+      <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
+          (click)="nextPage()"></i></div>
+    </div> -->
   </p-card>
 </div>
 <div class="flex justify-content-center my-5">

@@ -1,6 +1,7 @@
 const db = require('../../model');
 const Stock = db.stocks;
 const TestValue = db.testValues
+const ExecutionFile = db.executionSheet
 
 const convertSheetColumnsToDatabase = (sheetColumns, userId) => {
   const columnMapping = {
@@ -25,6 +26,30 @@ const convertSheetColumnsToDatabase = (sheetColumns, userId) => {
   return columnsWithUserId;
 };
 
+const convertExecutionSheetColumns = (sheetColumns, userId) => {
+  const columnMapping = {
+    'sheetnames': 'sheetNames',
+    'stock symbol': 'stockSymbol',
+    'weightage': 'weightage',
+    'fall in stock': 'fallInStock',
+    'limit level': 'limitLevel',
+    'hld days': 'hldDay',
+  };
+
+  const normalizedColumns = sheetColumns.map((sheetColumn) => sheetColumn.toLowerCase());
+
+  if (normalizedColumns.includes('hld day')) {
+    const index = normalizedColumns.indexOf('hld day');
+    normalizedColumns[index] = 'hld days';
+  }
+  const columnsWithUserId = normalizedColumns.map((sheetColumn) => columnMapping[sheetColumn]);
+  if (userId && !columnsWithUserId.includes('userId')) {
+    columnsWithUserId.push('userId');
+  }
+
+  return columnsWithUserId;
+};
+
 
 
 // Function to process data from the Excel file and update the RDS database
@@ -33,14 +58,22 @@ let databaseColumns
 let originalFileName
 if(fileType === "stockFile") {
   originalFileName = fileName.split('.')
-
 }
 try{
-    const columns = getColumnsFromHeaderRow(worksheet.getRow(1).values);
+  let columns
+    if(fileType !== 'executionFile') {
+      columns = getColumnsFromHeaderRow(worksheet.getRow(1).values);
+    }else {
+      columns = getColumnsFromHeaderRow(worksheet.getRow(2).values);
+    }
+
 
     if(fileType === 'testFile') {
      databaseColumns = convertSheetColumnsToDatabase(columns, userId);
     }
+    if(fileType === 'executionFile') {
+      databaseColumns = convertExecutionSheetColumns(columns, userId);
+     }
 
     if(fileType === 'stockFile') {
       if(columns.includes('close')) {
@@ -59,14 +92,21 @@ try{
     }
 
     const rows = [];
-    for (let i = 2; i <= worksheet.rowCount; i++) {
-        const rowData = worksheet.getRow(i).values;
 
+    for (let i = (fileType !== 'executionFile' ? 2 : 3); i <= worksheet.rowCount; i++) {
+      const rowData = worksheet.getRow(i).values;
+      let executionData
+
+      //to remove formula cells from execution sheet
+      if(fileType === 'executionFile') {
+        executionData = rowData.filter((data) => typeof data !== 'object');
+      }
+      
         // Skip the first row and empty rows
         if (rowData.every(cell => cell === undefined || cell === null)) {
           continue;
         }
-        const rowObject = mapRowToObject(fileType === 'testFile' ? databaseColumns : columns, rowData, originalFileName ? originalFileName[0] : '', userId);
+        const rowObject = mapRowToObject((fileType === 'testFile' || fileType === 'executionFile') ? databaseColumns : columns, fileType === 'executionFile' ? executionData : rowData, originalFileName ? originalFileName[0] : '', userId);
         // Skip rows with unexpected values
         if (rowObject === null) {
           continue;
@@ -82,6 +122,12 @@ try{
       await TestValue.bulkCreate(rows, {
         fields: databaseColumns,
         updateOnDuplicate: databaseColumns,
+      });
+      break;
+    case 'executionFile':
+      await ExecutionFile.bulkCreate(rows, {        
+        fields: databaseColumns,
+        updateOnDuplicate: databaseColumns, 
       });
       break;
    }

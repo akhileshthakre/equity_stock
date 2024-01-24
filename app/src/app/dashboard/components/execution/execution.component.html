@@ -1,1 +1,169 @@
-<p>execution works!</p>
+<div class="grid main">
+    <p-card class="col-4">
+        <ng-template pTemplate="header">
+            <h2 class="pt-1 pl-2 mb-1">Upload execution sheet </h2>
+        </ng-template>
+        <p-toast></p-toast>
+        <p-fileUpload name="demo[]" #fileUpload [multiple]="true"
+            (uploadHandler)="uploadExecutionSheet($event,fileUpload)" [customUpload]="true"
+            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+            <ng-template pTemplate="content">
+                <ul *ngIf="uploadedFiles.length">
+                    <li *ngFor="let file of uploadedFiles">{{ file.name }} - {{ file.size }} bytes</li>
+                </ul>
+            </ng-template>
+        </p-fileUpload>
+    </p-card>
+
+    <p-card class="col-4">
+        <div class="calculate">
+            <h2 class="pl-2 mb-1">Upload path</h2>
+            <div>
+                <input type="file" id="fileInput" #sendPath [disabled]="!executionList.length" (change)="uploadFolder($event)" multiple webkitdirectory />
+            </div>
+        </div>
+    </p-card>
+
+    <p-card class="col-4">
+        <div class="calculate">
+            <h2 class="pl-2 mb-1">Calculation</h2>
+            <p-button class="pt-1" label="Calculate" [disabled]="!calculateFileNames.length" (click)="calculate()"></p-button>
+        </div>
+    </p-card>
+</div>
+
+<div class="grid main">
+
+    <div [ngStyle]="{'width': uploadedStockFiles.length ? 'revert-layer' : '100%' }"
+        [ngClass]="{'col-9':  uploadedStockFiles.length}" *ngIf="executionList.length">
+        <p-card styleClass="mt-3">
+            <ng-template pTemplate="header">
+                <div class="stock-header">
+                    <h2 class="px-3 pt-3">Execution Sheet</h2>
+                </div>
+            </ng-template>
+            <p-table [value]="executionList" [paginator]="true" [rows]="5"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [rowsPerPageOptions]="[5,10, 25, 50]">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="sheetNames"> Sheet Name <p-sortIcon field="sheetNames"></p-sortIcon></th>
+                        <th pSortableColumn="stockSymbol">Stock Symbol <p-sortIcon field="stockSymbol"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="weightage">Weightage <p-sortIcon field="weightage"></p-sortIcon></th>
+                        <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon>
+                        </th>
+                        <th pSortableColumn="limitLevel">Limit Level<p-sortIcon field="limitLevel"></p-sortIcon></th>
+                        <th pSortableColumn="hldDay"> Hld Day <p-sortIcon field="hldDay"></p-sortIcon></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>{{product.sheetNames}}</td>
+                        <td>{{product.stockSymbol }}</td>
+                        <td>{{product.weightage}}</td>
+                        <td>{{product.fallInStock}}</td>
+                        <td>{{product.limitLevel}}</td>
+                        <td>{{product.hldDay}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-card>
+    </div>
+
+
+
+
+    <div class="col-3" *ngIf="uploadedStockFiles.length">
+        <p-card styleClass="mt-3">
+            <ng-template pTemplate="header">
+                <div class="stock-header">
+                    <h2 class="px-3 pt-3">Stocks Sheet</h2>
+                </div>
+            </ng-template>
+            <p-table [value]="uploadedStockFiles" [paginator]="uploadedStockFiles.length > 5" [rows]="5"
+                currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+                [rowsPerPageOptions]="[5,10, 25, 50]">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th pSortableColumn="name"> Stock Name <p-sortIcon field="name"></p-sortIcon></th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-product>
+                    <tr>
+                        <td>{{product.name}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </p-card>
+    </div>
+</div>
+
+<div class="out-put main" *ngIf="outputData.length">
+    <p-card styleClass="mt-3">
+        <ng-template pTemplate="header">
+            <div class="stock-header">
+                <h2 class="px-3 pt-3">Execution Output Table</h2>
+                 <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="stockExceldownload()"></i>
+            </div>
+        </ng-template>
+        <p-table [value]="outputData" [paginator]="outputData.length > 5" [rows]="5"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+            [rowsPerPageOptions]="[5,10, 25, 50]">
+            <ng-template pTemplate="header">
+                <tr>
+                    <th pSortableColumn="SheetNames">Stock Name <p-sortIcon field="SheetNames"></p-sortIcon></th>                     
+                    <th pSortableColumn="stockSymbol"> Stock Symbol <p-sortIcon field="stockSymbol"></p-sortIcon></th>                     
+                    <th pSortableColumn="weightage"> Weightage <p-sortIcon field="weightage"></p-sortIcon></th>                     
+                    <th pSortableColumn="fallInStock"> Fall In Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>                     
+                    <th pSortableColumn="limitLevel"> Limit Level <p-sortIcon field="limitLevel"></p-sortIcon></th>                     
+                    <th pSortableColumn="hldDay"> Hld Day <p-sortIcon field="hldDay"></p-sortIcon></th>                     
+                    <th pSortableColumn="bp"> BP <p-sortIcon field="bp"></p-sortIcon></th>                     
+                    <th pSortableColumn="posInitiated"> Pos Initiated <p-sortIcon field="posInitiated"></p-sortIcon></th>                     
+                    <th pSortableColumn="sloss"> SLOSS <p-sortIcon field="sloss"></p-sortIcon></th>                     
+                    <th pSortableColumn="tgt"> TGT <p-sortIcon field="tgt"></p-sortIcon></th>                     
+                    <th pSortableColumn="slhit"> SLHIT <p-sortIcon field="slhit"></p-sortIcon></th>                     
+                    <th pSortableColumn="tgtHit"> TGTHIT <p-sortIcon field="tgtHit"></p-sortIcon></th>                     
+                    <th pSortableColumn="hld_day"> hld_day <p-sortIcon field="hld_day"></p-sortIcon></th>                     
+                    <th pSortableColumn="tradeClose"> Trade Close <p-sortIcon field="tradeClose"></p-sortIcon></th>                     
+                    <th pSortableColumn="sp"> SP <p-sortIcon field="sp"></p-sortIcon></th>                     
+                    <th pSortableColumn="carry"> Carry <p-sortIcon field="carry"></p-sortIcon></th>                     
+                    <th pSortableColumn="ret"> RET <p-sortIcon field="ret"></p-sortIcon></th>                     
+                    <th pSortableColumn="nd"> ND <p-sortIcon field="nd"></p-sortIcon></th>                     
+                    <th pSortableColumn="lp"> LP <p-sortIcon field="lp"></p-sortIcon></th>                     
+                </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-product>
+                <tr>
+                    <td>{{product.SheetNames}}</td> 
+                    <td>{{product.stockSymbol}}</td> 
+                    <td>{{product.weightage}}</td> 
+                    <td>{{product.fallInStock}}</td> 
+                    <td>{{product.limitLevel}}</td> 
+                    <td>{{product.hldDay}}</td> 
+                    <td>{{product.bp}}</td> 
+                    <td>{{product.posInitiated}}</td> 
+                    <td>{{product.sloss}}</td> 
+                    <td>{{product.tgt}}</td> 
+                    <td>{{product.slhit}}</td> 
+                    <td>{{product.tgtHit}}</td> 
+                    <td>{{product.hld_day}}</td> 
+                    <td>{{product.tradeClose}}</td> 
+                    <td>{{product.sp}}</td> 
+                    <td>{{product.carry}}</td> 
+                    <td>{{product.ret}}</td> 
+                    <td>{{product.nd}}</td> 
+                    <td>{{product.lp}}</td> 
+                </tr>
+            </ng-template>
+        </p-table>
+    </p-card>
+</div>
+
+
+<div class="flex justify-content-center my-5">
+    <video controls="false" autoplay loop muted style="width: 70%;">
+        <source src="/assets/videos/stock video.mp4" type="video/mp4">
+    </video>
+
+</div>
