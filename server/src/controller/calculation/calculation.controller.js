@@ -17,9 +17,9 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
       const totalRetSum = result.reduce((acc, stock) => acc + (stock.Ret || 0.0), 0);
       const avgGain =
         numberOfUpMoves + numberOfDownMoves > 0
-          ? (((totalRetSum) / 100) / (totalDays)) * 100
+          ? (((totalRetSum) / 100) / (totalDays))
           : -1;
-      const winPercent = numberOfUpMoves > 0 ? (numberOfUpMoves / totalDays) * 100 : 0;
+      const winPercent = numberOfUpMoves > 0 ? (numberOfUpMoves / totalDays) : 0;
 
       return {
         nameOfStock: stockId || stocks[0].dataValues.name,
@@ -29,7 +29,7 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
         numberOfUpMoves,
         numberOfDownMoves,
         totalDays,
-        totalRetSum: totalRetSum,
+        totalRetSum: totalRetSum / 100,
         avgGain,
         winPercent,
       };

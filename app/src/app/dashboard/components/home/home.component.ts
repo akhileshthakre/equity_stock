@@ -203,12 +203,31 @@ export class HomeComponent implements OnInit {
         const mappedData = data.map((item: any) => {
             const mappedItem: any = {};
             mappingHeaders.forEach((fieldMap, index) => {
-                mappedItem[headers[index]] = item[fieldMap];
+                let value = item[fieldMap];
+                if (value !== undefined && value !== null) {
+                    mappedItem[headers[index]] = value;
+                } else {
+                    mappedItem[headers[index]] = null;
+                }
             });
             return mappedItem;
         });
-
+    
         const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
+    
+        const percentageColumns: number[] = [1, 2, 5, 6, 7]; // Adjust column indices based on excel columns where % used
+        percentageColumns.forEach(columnIndex => {
+            const range = XLSX.utils.decode_range(worksheet['!ref']!);
+            for (let i = range.s.r + 1; i <= range.e.r; i++) {
+                const cellAddress = XLSX.utils.encode_cell({ r: i, c: columnIndex });
+                const cell = worksheet[cellAddress];
+                if (cell && cell.t === 'n') {
+                    cell.z = '0.00%'; // Setting the percentage format
+                }
+            }
+        });
+    
+        // Create a new workbook
         const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         XLSX.writeFile(workbook, `${fileName}`);
 
@@ -340,13 +359,27 @@ export class HomeComponent implements OnInit {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
             delete item.numberOfDownMoves;
+            item.fallInStock = Number(item.fallInStock);
+            item.limitLevel = Number(item.limitLevel);
+            item.hldDay = Number(item.hldDay);
+            item.totalRetSum = Number(item.totalRetSum);
+            item.avgGain = Number(item.avgGain);
+            item.winPercent = Number(item.winPercent);
+        });
+    }
+
+    //This function should be display on the screen
+    formatDisplayOPList() {
+        this.outputList.map((item) => {
+            delete item.numberOfUpMoves;
+            delete item.numberOfDownMoves;
             // item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
             item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
             item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
             item.hldDay = Number(item.hldDay);
-            item.totalRetSum = this.formatPercentage(Number(item.totalRetSum));
-            item.avgGain = this.formatPercentage(Number(item.avgGain));
-            item.winPercent = this.formatPercentage(Number(item.winPercent));
+            item.totalRetSum = this.formatPercentage(Number(item.totalRetSum * 100));
+            item.avgGain = this.formatPercentage(Number(item.avgGain * 100));
+            item.winPercent = this.formatPercentage(Number(item.winPercent * 100));
         });
     }
 
