@@ -212,9 +212,9 @@ export class HomeComponent implements OnInit {
             });
             return mappedItem;
         });
-    
+
         const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
-    
+
         const percentageColumns: number[] = [1, 2, 5, 6, 7]; // Adjust column indices based on excel columns where % used
         percentageColumns.forEach(columnIndex => {
             const range = XLSX.utils.decode_range(worksheet['!ref']!);
@@ -226,7 +226,7 @@ export class HomeComponent implements OnInit {
                 }
             }
         });
-    
+
         // Create a new workbook
         const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
         XLSX.writeFile(workbook, `${fileName}`);
@@ -234,6 +234,7 @@ export class HomeComponent implements OnInit {
         this.spinnerService.showSpinner(false)
     }
     downloadOPExcl() {
+        this.formatOPList();
         this.exportToExcl(1, 'output.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
     }
 
@@ -252,13 +253,13 @@ export class HomeComponent implements OnInit {
             this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
                 this.spinnerService.showSpinner(false)
                 let list: any[] = [].concat(...resp.data)
-                list.map((item: any) => {
-                    item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
-                    item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + "%";
+                list.map((item: any) => { 
+                    item.fallInStock = Number(item.fallInStock);
+                    item.limitLevel = Number(item.limitLevel);
                     item.hldDay = Number(item.hldDay);
-                    item.totalRetSum = Number(item.totalRetSum).toFixed(2) + "%";
-                    item.avgGain = Number(item.avgGain).toFixed(2) + "%";
-                    item.winPercent = Number(item.winPercent).toFixed(2) + "%";
+                    item.totalRetSum = Number(item.totalRetSum);
+                    item.avgGain = Number(item.avgGain);
+                    item.winPercent = Number(item.winPercent);
                 });
                 this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
             })
@@ -313,13 +314,13 @@ export class HomeComponent implements OnInit {
                     setTimeout(() => {
                         let index = 0
                         Object.entries(groupedData).forEach(([key, value]) => {
-                            (value as Array<any>).map((item: any) => {
-                                item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
-                                item.limitLevel = Number(item.limitLevel * 100).toFixed(2) + "%";
+                            (value as Array<any>).map((item: any) => {  
+                                item.fallInStock = Number(item.fallInStock);
+                                item.limitLevel = Number(item.limitLevel);
                                 item.hldDay = Number(item.hldDay);
-                                item.totalRetSum = Number(item.totalRetSum).toFixed(2) + "%";
-                                item.avgGain = Number(item.avgGain).toFixed(2) + "%";
-                                item.winPercent = Number(item.winPercent).toFixed(2) + "%";
+                                item.totalRetSum = Number(item.totalRetSum);
+                                item.avgGain = Number(item.avgGain);
+                                item.winPercent = Number(item.winPercent);
                             });
                             console.log(value)
                             let data = {
@@ -332,19 +333,13 @@ export class HomeComponent implements OnInit {
                     }, 0);
                 }
 
-                this.formatOPList()
-                if (type == 3) this.exportToExcl(type, 'out_put.xlsx', [].concat(...resp.data), this.opHeaders, this.opHeadersMapping)
-                //else if (type == 4) this.exportToExcl(type, obj.stockId + '.xlsx', [].concat(...resp.data), this.opHeaders, this.opHeadersMapping)
-                this.showOutPutTable = true
 
-                // while (this.uploadedTestValues.length) {
-                //     this.uploadedTestValues.pop();
-                // }
-                // while (this.uploadedFiles.length) {
-                //     this.uploadedFiles.pop();
-                // }
-                // this.testList = []
-                // this.products = []
+                if (type == 3) {
+                    this.formatOPList()
+                    this.exportToExcl(type, 'out_put.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                }
+                this.formatDisplayOPList()
+                this.showOutPutTable = true           
 
             } else {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
@@ -372,8 +367,7 @@ export class HomeComponent implements OnInit {
     formatDisplayOPList() {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
-            delete item.numberOfDownMoves;
-            // item.fallInStock = Number(item.fallInStock * 100).toFixed(1) + "%";
+            delete item.numberOfDownMoves; 
             item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
             item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
             item.hldDay = Number(item.hldDay);
