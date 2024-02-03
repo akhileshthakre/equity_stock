@@ -13,7 +13,7 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
       const result = calculateValues(stocks, testValue.dataValues, slossPercent, tgPercent, tsPercent);
       const numberOfUpMoves = result.filter((stock) => stock.Ret > 0.0).length;
       const numberOfDownMoves = result.filter((stock) => stock.Ret === 0.0 || stock.Ret < 0.0).length;
-      const totalDays = result.filter((stock) => stock.Ret).length
+      const totalDays = numberOfUpMoves + numberOfDownMoves
       const totalRetSum = result.reduce((acc, stock) => acc + (stock.Ret || 0.0), 0);
       const avgGain =
         numberOfUpMoves + numberOfDownMoves > 0
