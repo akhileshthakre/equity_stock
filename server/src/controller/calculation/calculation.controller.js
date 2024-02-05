@@ -13,7 +13,7 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
       const result = calculateValues(stocks, testValue.dataValues, slossPercent, tgPercent, tsPercent);
       const numberOfUpMoves = result.filter((stock) => stock.Ret > 0.0).length;
       const numberOfDownMoves = result.filter((stock) => stock.Ret === 0.0 || stock.Ret < 0.0).length;
-      const totalDays = result.filter((stock) => stock.Ret).length
+      const totalDays = numberOfUpMoves + numberOfDownMoves
       const totalRetSum = result.reduce((acc, stock) => acc + (stock.Ret || 0.0), 0);
       const avgGain =
         numberOfUpMoves + numberOfDownMoves > 0
@@ -46,6 +46,8 @@ const CalculationService = {
     let stocks, testValues, filteredTestValues, results;
 
     try {
+      let isFirstChunk = true;
+
       if (downloadAll) {
         [stocks, testValues] = await Promise.all([Stock.findAll({where: {userId}}), TestValue.findAll({where: {userId}})]);
       } else if(stockId){
@@ -69,11 +71,16 @@ const CalculationService = {
         group: ['name'],
         raw: true,
       });      
-      const testValuesBatches = Array.from({ length: NUM_THREADS }, (_, index) =>
-        testValues.slice((index * testValues.length) / NUM_THREADS, ((index + 1) * testValues.length) / NUM_THREADS)
+      const testValuesBatches = await Promise.all(
+        Array.from({ length: NUM_THREADS }, async (_, index) => {
+          const start = (index * testValues.length) / NUM_THREADS;
+          const end = ((index + 1) * testValues.length) / NUM_THREADS;
+          return testValues.slice(start, end);
+        })
       );
+      
 
-      results = [];
+      res.write('{ "data": [');
 
       for (const stock of uniqueStocks) {
         const stockName = stock.name;
@@ -85,19 +92,24 @@ const CalculationService = {
               workerData: { filteredTestValues, testValues: batch, slossPercent, tgPercent, tsPercent, stockId},
             });
 
-            worker.on('message', resolve);
+            worker.on('message', (result) => {
+              if (!isFirstChunk) {
+                res.write(',');
+              }
+              res.write(JSON.stringify(result));
+              isFirstChunk = false;
+              resolve();
+            });
           })
         );
 
-        const stockResults = await Promise.all(workerPromises);
-        results.push(stockResults);
+        await Promise.all(workerPromises);
+
       }
 
-      const resp = results.flat();
-
-      res.send({
-        data: resp,
-      });
+      // Close the JSON array and send the final response
+      res.write(']}');
+      res.end();
     } catch (error) {
       res.status(500).json({ error: error.message });
     }

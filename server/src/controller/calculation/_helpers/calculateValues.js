@@ -197,6 +197,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
       return "";
     } else {
       if ((posInitial === 1 || prevCarry === 1) && (slHit === 1 || tgtHit === 1 || hldDay === constantF1) ) {
+        // console.log('..................', hldDay, prevCarry, posInitial, slHit, tgtHit)
         return 1;
       } else {
         return 0;
@@ -287,9 +288,8 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const ret = isNaN(sp / bp - 1) ? '' : (sp / bp - 1);
-    const test = ret * 100
-    const rounfOff = Math.round(test * 10) / 10;
-    return rounfOff;
+    const test = ret * 1000
+    return roundToDecimalPlaces(test/10);
   };
 
   const calculateND = (stock, prevStock, index, testValue) => {
@@ -328,7 +328,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
   }
 
   const  roundToDecimalPlaces = (number)  => {
-    let factor = Math.pow(10, 2);
+    let factor = Math.pow(10, 4);
     return Math.round(number * factor) / factor;
   }
   
