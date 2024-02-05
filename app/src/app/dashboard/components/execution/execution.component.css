@@ -1,7 +1,32 @@
-/*# sourceMappingURL=execution.component.css.map */
+.calculate {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
 .main {
-    max-width: 90%;
-    margin: auto;
-  }
-  
+  max-width: 90%;
+  margin: auto;
+}
+
+.stock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 90%;
+  margin: auto;
+}
+
+input[type=file]::file-selector-button {
+  background: #27ae60;
+  border: 1px #27ae60;
+  padding: 7px 6px;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+}
+
+td,
+th {
+  text-align: center !important;
+}/*# sourceMappingURL=execution.component.css.map */

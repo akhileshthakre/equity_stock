@@ -56,7 +56,7 @@ export class ExecutionComponent implements OnInit {
     )).pipe(switchMap(val => this.executionApiService.getAllExecutionInfo())).subscribe((resp: any) => {
       this.spinnerService.showSpinner(false)
       if (resp) {
-        console.log(resp)
+       // console.log(resp)
         this.executionList = resp.data
         this.executionList.forEach((element: any) => {
           this.specifiedFileNames.push(element.sheetNames + '.xlsx')
@@ -139,6 +139,7 @@ export class ExecutionComponent implements OnInit {
         this.spinnerService.showSpinner(false)
         if (response) {
           this.outputData = response.data
+          this.formatDisplayOPData()
         } else {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
         }
@@ -151,25 +152,102 @@ export class ExecutionComponent implements OnInit {
 
   }
 
+  downloadExcel(){
+    //this.formatOPData()
+    this.stockExceldownload('out_put.xlsx', this.outputData, this.opHeaders, this.opHeadersMapping)
+  }
 
-  stockExceldownload() {
-    let data = this.outputData
-    let headers = this.opHeaders
-    let mappingHeaders = this.opHeadersMapping
-    const mappedData = data.map((item: any) => {
+   stockExceldownload(fileName: string, data: any, headers: string[], mappingHeaders: string[]) {
+     const mappedData = data.map((item: any) => {
       const mappedItem: any = {};
       mappingHeaders.forEach((fieldMap, index) => {
-        mappedItem[headers[index]] = item[fieldMap];
+          let value = item[fieldMap];
+          if (value !== undefined && value !== null) {
+              mappedItem[headers[index]] = value;
+          } else {
+              mappedItem[headers[index]] = null;
+          }
       });
       return mappedItem;
-    });
+  });
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
-    const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
-    XLSX.writeFile(workbook, 'output.xlsx');
+  const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
+
+  const percentageColumns: number[] = [3,4]; // Adjust column indices based on excel columns where % used
+  percentageColumns.forEach(columnIndex => {
+      const range = XLSX.utils.decode_range(worksheet['!ref']!);
+      for (let i = range.s.r + 1; i <= range.e.r; i++) {
+          const cellAddress = XLSX.utils.encode_cell({ r: i, c: columnIndex });
+          const cell = worksheet[cellAddress];
+          if (cell && cell.t === 'n') {
+              cell.z = '0.00%'; // Setting the percentage format
+          }
+      }
+  });
+
+  // Create a new workbook
+  const workbook: XLSX.WorkBook = { Sheets: { 'data': worksheet }, SheetNames: ['data'] };
+  XLSX.writeFile(workbook, `${fileName}`);
+  // this.formatDisplayOPData()
+
+  this.spinnerService.showSpinner(false)
+
 
   }
 
+
+  async formatOPData() {
+    this.outputData.map((item) => { 
+      delete item.posInitiated;
+      item.SheetNames = String(item.SheetNames);
+      item.stockSymbol = String(item.stockSymbol);
+      item.weightage = Number(item.weightage);
+      item.fallInStock = Number(item.fallInStock);
+      item.limitLevel = Number(item.limitLevel);
+      item.hldDay = Number(item.hldDay);
+      item.bp =  Number(item.bp);
+      item.sloss =  Number(item.sloss);
+      item.tgt =  Number(item.tgt);
+      item.slhit =  Number(item.slhit);
+      item.tgtHit =  Number(item.tgtHit);
+      item.hld_day =  Number(item.hld_day);
+      item.tradeClose =  Number(item.tradeClose);
+      item.sp =  Number(item.sp);
+      item.carry =  Number(item.carry);
+      item.ret =  Number(item.ret);
+      item.nd =  Number(item.nd);
+      item.lp =  (item.lp);
+    });
+  }
+
+  //This function should be display on the screen
+  formatDisplayOPData() {
+    this.outputData.map((item) => {
+      delete item.posInitiated;
+      item.SheetNames = item.SheetNames;
+      item.stockSymbol = item.stockSymbol;
+      item.weightage = this.formatPercentage(Number(item.weightage * 100));
+      item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
+      item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
+      item.hldDay = Number(item.hldDay);
+      item.bp = Number(item.bp);
+      item.sloss = Number(item.sloss);
+      item.tgt = Number(item.tgt);
+      item.slhit = Number(item.slhit);
+      item.tgtHit = Number(item.tgtHit);
+      item.hld_day = Number(item.hld_day);
+      item.tradeClose = Number(item.tradeClose);
+      item.sp = Number(item.sp);
+      item.carry = Number(item.carry);
+      item.ret = Number(item.ret);
+      item.nd = Number(item.nd);
+      item.lp = (item.lp);
+    });
+  }
+
+  formatPercentage(val: number) {
+    return Number(val / 100).toLocaleString(undefined, { style: 'percent', minimumFractionDigits: 2 });
+  }
 
 
 

@@ -19,7 +19,8 @@
         <div class="calculate">
             <h2 class="pl-2 mb-1">Upload path</h2>
             <div>
-                <input type="file" id="fileInput" #sendPath [disabled]="!executionList.length" (change)="uploadFolder($event)" multiple webkitdirectory />
+                <input type="file" id="fileInput" #sendPath [disabled]="!executionList.length"
+                    (change)="uploadFolder($event)" multiple webkitdirectory />
             </div>
         </div>
     </p-card>
@@ -27,7 +28,8 @@
     <p-card class="col-4">
         <div class="calculate">
             <h2 class="pl-2 mb-1">Calculation</h2>
-            <p-button class="pt-1" label="Calculate" [disabled]="!calculateFileNames.length" (click)="calculate()"></p-button>
+            <p-button class="pt-1" label="Calculate" [disabled]="!calculateFileNames.length"
+                (click)="calculate()"></p-button>
         </div>
     </p-card>
 </div>
@@ -42,19 +44,17 @@
                     <h2 class="px-3 pt-3">Execution Sheet</h2>
                 </div>
             </ng-template>
-            <p-table [value]="executionList" [paginator]="true" [rows]="5"
+            <p-table [value]="executionList" [paginator]="executionList.length > 5" [rows]="5"
                 currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
                 [rowsPerPageOptions]="[5,10, 25, 50]">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="sheetNames"> Sheet Name <p-sortIcon field="sheetNames"></p-sortIcon></th>
-                        <th pSortableColumn="stockSymbol">Stock Symbol <p-sortIcon field="stockSymbol"></p-sortIcon>
-                        </th>
-                        <th pSortableColumn="weightage">Weightage <p-sortIcon field="weightage"></p-sortIcon></th>
-                        <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon>
-                        </th>
-                        <th pSortableColumn="limitLevel">Limit Level<p-sortIcon field="limitLevel"></p-sortIcon></th>
-                        <th pSortableColumn="hldDay"> Hld Day <p-sortIcon field="hldDay"></p-sortIcon></th>
+                        <th pSortableColumn="sheetNames"> Sheet Name </th>
+                        <th pSortableColumn="stockSymbol">Stock Symbol </th>
+                        <th pSortableColumn="weightage">Weightage </th>
+                        <th pSortableColumn="fallInStock">Fall in Stock </th>
+                        <th pSortableColumn="limitLevel">Limit Level </th>
+                        <th pSortableColumn="hldDay"> Hld Day </th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
@@ -86,7 +86,7 @@
                 [rowsPerPageOptions]="[5,10, 25, 50]">
                 <ng-template pTemplate="header">
                     <tr>
-                        <th pSortableColumn="name"> Stock Name <p-sortIcon field="name"></p-sortIcon></th>
+                        <th pSortableColumn="name"> Stock Name </th>
                     </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-product>
@@ -104,7 +104,7 @@
         <ng-template pTemplate="header">
             <div class="stock-header">
                 <h2 class="px-3 pt-3">Execution Output Table</h2>
-                 <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="stockExceldownload()"></i>
+                <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="downloadExcel()"></i>
             </div>
         </ng-template>
         <p-table [value]="outputData" [paginator]="outputData.length > 5" [rows]="5"
@@ -112,48 +112,48 @@
             [rowsPerPageOptions]="[5,10, 25, 50]">
             <ng-template pTemplate="header">
                 <tr>
-                    <th pSortableColumn="SheetNames">Stock Name <p-sortIcon field="SheetNames"></p-sortIcon></th>                     
-                    <th pSortableColumn="stockSymbol"> Stock Symbol <p-sortIcon field="stockSymbol"></p-sortIcon></th>                     
-                    <th pSortableColumn="weightage"> Weightage <p-sortIcon field="weightage"></p-sortIcon></th>                     
-                    <th pSortableColumn="fallInStock"> Fall In Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>                     
-                    <th pSortableColumn="limitLevel"> Limit Level <p-sortIcon field="limitLevel"></p-sortIcon></th>                     
-                    <th pSortableColumn="hldDay"> Hld Day <p-sortIcon field="hldDay"></p-sortIcon></th>                     
-                    <th pSortableColumn="bp"> BP <p-sortIcon field="bp"></p-sortIcon></th>                     
-                    <th pSortableColumn="posInitiated"> Pos Initiated <p-sortIcon field="posInitiated"></p-sortIcon></th>                     
-                    <th pSortableColumn="sloss"> SLOSS <p-sortIcon field="sloss"></p-sortIcon></th>                     
-                    <th pSortableColumn="tgt"> TGT <p-sortIcon field="tgt"></p-sortIcon></th>                     
-                    <th pSortableColumn="slhit"> SLHIT <p-sortIcon field="slhit"></p-sortIcon></th>                     
-                    <th pSortableColumn="tgtHit"> TGTHIT <p-sortIcon field="tgtHit"></p-sortIcon></th>                     
-                    <th pSortableColumn="hld_day"> hld_day <p-sortIcon field="hld_day"></p-sortIcon></th>                     
-                    <th pSortableColumn="tradeClose"> Trade Close <p-sortIcon field="tradeClose"></p-sortIcon></th>                     
-                    <th pSortableColumn="sp"> SP <p-sortIcon field="sp"></p-sortIcon></th>                     
-                    <th pSortableColumn="carry"> Carry <p-sortIcon field="carry"></p-sortIcon></th>                     
-                    <th pSortableColumn="ret"> RET <p-sortIcon field="ret"></p-sortIcon></th>                     
-                    <th pSortableColumn="nd"> ND <p-sortIcon field="nd"></p-sortIcon></th>                     
-                    <th pSortableColumn="lp"> LP <p-sortIcon field="lp"></p-sortIcon></th>                     
+                    <th pSortableColumn="SheetNames">Stock Name </th>
+                    <th pSortableColumn="stockSymbol"> Stock Symbol </th>
+                    <th pSortableColumn="weightage"> Weightage </th>
+                    <th pSortableColumn="fallInStock"> Fall In Stock </th>
+                    <th pSortableColumn="limitLevel"> Limit Level </th>
+                    <th pSortableColumn="hldDay"> Hld Day </th>
+                    <th pSortableColumn="bp"> BP </th>
+                    <!-- <th pSortableColumn="posInitiated"> Pos Initiated </th> -->
+                    <th pSortableColumn="sloss"> SLOSS </th>
+                    <th pSortableColumn="tgt"> TGT </th>
+                    <th pSortableColumn="slhit"> SLHIT </th>
+                    <th pSortableColumn="tgtHit"> TGTHIT </th>
+                    <th pSortableColumn="hld_day"> hld_day </th>
+                    <th pSortableColumn="tradeClose"> Trade Close </th>
+                    <th pSortableColumn="sp"> SP </th>
+                    <th pSortableColumn="carry"> Carry </th>
+                    <th pSortableColumn="ret"> RET </th>
+                    <th pSortableColumn="nd"> ND </th>
+                    <th pSortableColumn="lp"> LP </th>
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-product>
                 <tr>
-                    <td>{{product.SheetNames}}</td> 
-                    <td>{{product.stockSymbol}}</td> 
-                    <td>{{product.weightage}}</td> 
-                    <td>{{product.fallInStock}}</td> 
-                    <td>{{product.limitLevel}}</td> 
-                    <td>{{product.hldDay}}</td> 
-                    <td>{{product.bp}}</td> 
-                    <td>{{product.posInitiated}}</td> 
-                    <td>{{product.sloss}}</td> 
-                    <td>{{product.tgt}}</td> 
-                    <td>{{product.slhit}}</td> 
-                    <td>{{product.tgtHit}}</td> 
-                    <td>{{product.hld_day}}</td> 
-                    <td>{{product.tradeClose}}</td> 
-                    <td>{{product.sp}}</td> 
-                    <td>{{product.carry}}</td> 
-                    <td>{{product.ret}}</td> 
-                    <td>{{product.nd}}</td> 
-                    <td>{{product.lp}}</td> 
+                    <td>{{product.SheetNames}}</td>
+                    <td>{{product.stockSymbol}}</td>
+                    <td>{{product.weightage}}</td>
+                    <td>{{product.fallInStock}}</td>
+                    <td>{{product.limitLevel}}</td>
+                    <td>{{product.hldDay}}</td>
+                    <td>{{product.bp}}</td>
+                    <!-- <td>{{product.posInitiated}}</td> -->
+                    <td>{{product.sloss}}</td>
+                    <td>{{product.tgt}}</td>
+                    <td>{{product.slhit}}</td>
+                    <td>{{product.tgtHit}}</td>
+                    <td>{{product.hld_day}}</td>
+                    <td>{{product.tradeClose}}</td>
+                    <td>{{product.sp}}</td>
+                    <td>{{product.carry}}</td>
+                    <td>{{product.ret}}</td>
+                    <td>{{product.nd}}</td>
+                    <td>{{product.lp}}</td>
                 </tr>
             </ng-template>
         </p-table>

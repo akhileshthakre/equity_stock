@@ -27,6 +27,7 @@ export class HomeComponent implements OnInit {
     pageNumber: number = 0;
     fileCount: number = 0
     data: any;
+    isNewFormula:boolean= false
     showOutPutTable: boolean = false
     options: any;
     uploadedFiles: any[] = [];
@@ -49,6 +50,8 @@ export class HomeComponent implements OnInit {
         //this.getTestValuesFile()
     }
 
+   
+
     get slossPercentControl() {
         return this.backTestForm.get('slossPercent')
     }
@@ -61,7 +64,7 @@ export class HomeComponent implements OnInit {
 
     onUpload(event: UploadEvent, fileUpload: any) {
         this.spinnerService.showSpinner(true)
-        console.log(event)
+       // console.log(event)
         for (let file of event.files) {
             this.uploadedFiles.push(file);
         }
@@ -268,7 +271,8 @@ export class HomeComponent implements OnInit {
 
     downloadInExcl() {
         const obj: any = {
-            "downloadAll": true
+            downloadAll: true,
+            isNewFormula : this.isNewFormula
         }
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
@@ -282,6 +286,7 @@ export class HomeComponent implements OnInit {
         if (type) this.pageNumber = 1;
         const obj: any = {
             page: this.pageNumber,
+            isNewFormula : this.isNewFormula
         }
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
@@ -297,7 +302,7 @@ export class HomeComponent implements OnInit {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
             if (resp) {
-                console.log(resp)
+                //console.log(resp)
                 if (this.fileCount < 2) {
                     this.outputList = [].concat(...resp.data)
 
@@ -322,7 +327,7 @@ export class HomeComponent implements OnInit {
                                 item.avgGain = Number(item.avgGain);
                                 item.winPercent = Number(item.winPercent);
                             });
-                            console.log(value)
+                            //console.log(value)
                             let data = {
                                 name: key,
                                 opData: value,
@@ -339,7 +344,8 @@ export class HomeComponent implements OnInit {
                     this.exportToExcl(type, 'out_put.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
                 }
                 this.formatDisplayOPList()
-                this.showOutPutTable = true           
+                this.showOutPutTable = true    
+                //this.isNewFormula = false       
 
             } else {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
