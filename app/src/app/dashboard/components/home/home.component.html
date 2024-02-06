@@ -35,8 +35,9 @@
         <h2 class="pl-2 mb-1" style="flex-grow: 2;">Back Test</h2>
         <div class="mr-1">
           <label class="switch">         
-            <input type="checkbox" [(ngModel)]="isNewFormula" >
+            <input type="checkbox" [(ngModel)]="isNewFormula">
             <span class="slider round"></span>
+            <div>Use BP Variation</div>
           </label>
         </div>
         <p-button class="pt-1" label="Start Back Test"
@@ -165,14 +166,14 @@
       [rowsPerPageOptions]="[5,10, 25, 50]">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="nameOfStock"> Name </th>
-          <th pSortableColumn="fallInStock">Fall in Stock </th>
-          <th pSortableColumn="limitLevel">LimitLevel </th>
-          <th pSortableColumn="hldDay">HoldingDay </th>
-          <th pSortableColumn="totalDays">#OfDays </th>
-          <th pSortableColumn="totalRetSum">TotalSum </th>
-          <th pSortableColumn="avgGain">AvgGain </th>
-          <th pSortableColumn="winPercent">Win% </th>
+          <th pSortableColumn="nameOfStock"> Name <p-sortIcon field="nameOfStock"></p-sortIcon></th>
+          <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>
+          <th pSortableColumn="limitLevel">LimitLevel <p-sortIcon field="limitLevel"></p-sortIcon></th>
+          <th pSortableColumn="hldDay">HoldingDay <p-sortIcon field="hldDay"></p-sortIcon></th>
+          <th pSortableColumn="totalDays">#OfDays <p-sortIcon field="totalDays"></p-sortIcon></th>
+          <th pSortableColumn="totalRetSum">TotalSum <p-sortIcon field="totalRetSum"></p-sortIcon></th>
+          <th pSortableColumn="avgGain">AvgGain <p-sortIcon field="avgGain"></p-sortIcon></th>
+          <th pSortableColumn="winPercent">Win% <p-sortIcon field="winPercent"></p-sortIcon></th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-product>

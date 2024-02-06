@@ -80,6 +80,17 @@ th {
     transition: .4s;
   }
   
+  .slider+div {
+    display: none;
+  }
+
+  .slider:hover+div {
+    position: absolute;
+    display: flex;
+    padding-top: 10px;
+    }
+  
+  
   .slider:before {
     // position: absolute;
     // content: "";
