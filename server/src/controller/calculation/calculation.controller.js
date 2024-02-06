@@ -7,10 +7,10 @@ const calculateValues = require('./_helpers/calculateValues');
 
 const NUM_THREADS = os.cpus().length;
 
-const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPercent, stockId) => {
+const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPercent, stockId, isNewFormula) => {
   const resp = await Promise.all(
     testValues.map(async (testValue) => {
-      const result = calculateValues(stocks, testValue.dataValues, slossPercent, tgPercent, tsPercent);
+      const result = calculateValues(stocks, testValue.dataValues, slossPercent, tgPercent, tsPercent, isNewFormula);
       const numberOfUpMoves = result.filter((stock) => stock.Ret > 0.0).length;
       const numberOfDownMoves = result.filter((stock) => stock.Ret === 0.0 || stock.Ret < 0.0).length;
       const totalDays = numberOfUpMoves + numberOfDownMoves
@@ -42,7 +42,7 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
 const CalculationService = {
   fetchData: async (req, res) => {
     const userId = req.user.userId
-    const { page = 1, pageSize = 100, downloadAll = false, slossPercent, tgPercent, tsPercent, stockId  } = req.body;
+    const { page = 1, pageSize = 100, downloadAll = false, slossPercent, tgPercent, tsPercent, stockId, isNewFormula = false  } = req.body;
     let stocks, testValues, filteredTestValues, results;
 
     try {
@@ -89,7 +89,7 @@ const CalculationService = {
         const workerPromises = testValuesBatches.map((batch) =>
           new Promise((resolve) => {
             const worker = new Worker(__filename, {
-              workerData: { filteredTestValues, testValues: batch, slossPercent, tgPercent, tsPercent, stockId},
+              workerData: { filteredTestValues, testValues: batch, slossPercent, tgPercent, tsPercent, stockId, isNewFormula},
             });
 
             worker.on('message', (result) => {
@@ -117,8 +117,8 @@ const CalculationService = {
 };
 
 if (!isMainThread) {
-  const { filteredTestValues, testValues, slossPercent, tgPercent, tsPercent, stockId } = workerData;
-  fetchDataBatch(filteredTestValues, testValues, slossPercent, tgPercent, tsPercent, stockId).then((result) => {
+  const { filteredTestValues, testValues, slossPercent, tgPercent, tsPercent, stockId, isNewFormula } = workerData;
+  fetchDataBatch(filteredTestValues, testValues, slossPercent, tgPercent, tsPercent, stockId, isNewFormula).then((result) => {
     parentPort.postMessage(result);
   });
 } else {

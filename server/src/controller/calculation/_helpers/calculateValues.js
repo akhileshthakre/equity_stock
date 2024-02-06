@@ -51,7 +51,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
 
   };
   
-  const calculateBP = (stock, prevStock, index, testValue) => {
+  const calculateBP = (stock, prevStock, index, testValue, isNewFormula) => {
     const fallInStock = testValue.fallInStock
     const limitLevel = testValue.limitLevel
     if (index === 0 || index === 1 || index === 2) {
@@ -66,17 +66,32 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const constantB1 = fallInStock / 100; // change it with B1 of the sheet
     const constantD1 = limitLevel / 100; // change it with D1 of the sheet
   
-    if (open === "") {
-      return "";
-    } 
-    if (prevCarry === 1) {
-        return prevBp;
-    } 
-    if (low < hrefPoint * (1 + constantB1 - constantD1)){
-        return roundToDecimalPlaces(hrefPoint * (1 + constantB1 - constantD1))
+    if(!isNewFormula) {
+      if (open === "") {
+        return "";
+      } 
+      if (prevCarry === 1) {
+          return prevBp;
+      } 
+      if (low < hrefPoint * (1 + constantB1 - constantD1)){
+          return roundToDecimalPlaces(hrefPoint * (1 + constantB1 - constantD1))
+      }else {
+          return ""
+      }
     }else {
-        return ""
+      if (open === "") {
+        return "";
+      } 
+      if (prevCarry === 1 && low < hrefPoint * (1 + constantB1)){
+        return prevBp;
+      }
+      if (low < hrefPoint * (1 + constantB1 - constantD1)) {
+        return roundToDecimalPlaces(hrefPoint * (1 + constantB1 - constantD1))
+      } else {
+        return "";
+      }
     }
+
   };
   
   
@@ -332,7 +347,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     return Math.round(number * factor) / factor;
   }
   
-  const calculateValues = (stocks, testCases, slossPercent, tgPercent, tsPercent) => {
+  const calculateValues = (stocks, testCases, slossPercent, tgPercent, tsPercent, isNewFormula) => {
     constantTGT = tgPercent ? tgPercent / 100 : 25 / 100
     constantSloss = slossPercent ? slossPercent / 100 : 10 / 100
     constantTS = tsPercent ? tsPercent / 100 : 0.08 / 100
@@ -350,7 +365,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
       const stock = stockData.dataValues
       const hrefPoint = calculateHRefPoints(stock, prevStock, index, testValue);
       const declineInRP = calculateDeclineFromRP(stock, prevStock, index, testValue);
-      const bp = calculateBP(stock, prevStock, index, testValue);
+      const bp = calculateBP(stock, prevStock, index, testValue, isNewFormula);
       const posInitial = calculatePosInitial(stock, prevStock, index, testValue);
       const tgt = calculateTGT(stock, prevStock, index, testValue);
       const slHit = calculateSLHit(stock, prevStock, index, testValue);
