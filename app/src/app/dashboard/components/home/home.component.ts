@@ -22,8 +22,8 @@ export class HomeComponent implements OnInit {
     productsHeadersMapping: string[] = ['period', 'price', 'high', 'low', 'open']
     testHeaders: string[] = ['Fall in stock', 'Limit level', 'Holding Day']
     testHeadersMapping: string[] = ['fallInStock', 'limitLevel', 'hldDay']
-    opHeaders: string[] = ['Stock name ', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %']
-    opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent']
+    opHeaders: string[] = ['Stock name ', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+    opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
     pageNumber: number = 0;
     fileCount: number = 0
     data: any;
@@ -263,6 +263,7 @@ export class HomeComponent implements OnInit {
                     item.totalRetSum = Number(item.totalRetSum);
                     item.avgGain = Number(item.avgGain);
                     item.winPercent = Number(item.winPercent);
+                    item.numberOfYears = Number(item.numberOfYears)
                 });
                 this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
             })
@@ -326,6 +327,8 @@ export class HomeComponent implements OnInit {
                                 item.totalRetSum = Number(item.totalRetSum);
                                 item.avgGain = Number(item.avgGain);
                                 item.winPercent = Number(item.winPercent);
+                                item.numberOfYears = Number(item.numberOfYears)
+
                             });
                             //console.log(value)
                             let data = {
@@ -366,6 +369,7 @@ export class HomeComponent implements OnInit {
             item.totalRetSum = Number(item.totalRetSum);
             item.avgGain = Number(item.avgGain);
             item.winPercent = Number(item.winPercent);
+            item.numberOfYears = Number(item.numberOfYears)
         });
     }
 
@@ -380,6 +384,8 @@ export class HomeComponent implements OnInit {
             item.totalRetSum = this.formatPercentage(Number(item.totalRetSum * 100));
             item.avgGain = this.formatPercentage(Number(item.avgGain * 100));
             item.winPercent = this.formatPercentage(Number(item.winPercent * 100));
+            item.numberOfYears = Number(item.numberOfYears)
+
         });
     }
 
