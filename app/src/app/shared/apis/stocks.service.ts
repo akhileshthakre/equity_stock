@@ -41,7 +41,7 @@ export class StocksApiService {
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
-    console.log(payload)
+    //console.log(payload)
     for (var x = 0; x < payload.length; x++) {
       formData.append("file", payload[x]);
     }
