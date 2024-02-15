@@ -2,6 +2,12 @@
     max-width: 90%;
     margin: auto;
 }
+.switch div{
+  z-index: 1;
+  color: #27ae60;
+  font-weight: 700;
+  top: 22px;
+}
 
 .stock-header {
     display: flex;
