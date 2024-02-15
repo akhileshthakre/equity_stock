@@ -18,10 +18,6 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
   const uniqueYears = Array.from(years);
   const numberOfYears = years.size
 
-  const  roundToDecimalPlaces = (number)  => {
-    let factor = Math.pow(10, 4);
-    return Math.round(number * factor) / factor;
-  }
 
   const resp = await Promise.all(
     testValues.map(async (testValue) => {
@@ -42,7 +38,7 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
         if (!acc[year]) {
             acc[year] = 0;
         }
-        acc[year] += roundToDecimalPlaces(stock.Ret || 0.0);
+        acc[year] += stock.Ret || 0.0;
         return acc;
       }, {});    
 

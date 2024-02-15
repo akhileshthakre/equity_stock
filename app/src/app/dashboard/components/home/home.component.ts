@@ -202,14 +202,9 @@ export class HomeComponent implements OnInit {
                 break;
         }
     }
-    // isNumeric(value: any) {
-    //     return ((typeof value === 'number') || (value === null)) && !isNaN(value);
-    // }
 
     exportToExcl(type: number, fileName: string, data: any, headers: string[], mappingHeaders: string[]) {
 
-        //console.log(headers)
-       // console.log(mappingHeaders)
 
         const mappedData = data.map((item: any) => {
             const mappedItem: any = {};
@@ -225,38 +220,13 @@ export class HomeComponent implements OnInit {
         });
 
 
-
-        // let orderedDataList: any[] = []
-
-        // mappedData.forEach((element: any) => {
-
-        //     let reorderedObject:any = {};
-
-        //     // Extracting and adding string properties first
-        //     Object.keys(element).filter(key => isNaN(Number(key))).forEach(key => {
-        //         reorderedObject[key] = element[key];
-        //     });
-
-        //     // Extracting and adding numeric properties next
-        //     Object.keys(element).filter(key => !isNaN(Number(key))).forEach(key => {
-        //         reorderedObject[key] = element[key];
-        //     });
-
-        //     orderedDataList.push(reorderedObject)
-
-        //     console.log(reorderedObject)
-
-        // });
-
-
-
-        console.log(mappedData)
-
-
-
         const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
+        const yearlyIndex = []
+        for(let i = 9; i<= headers.length; i++) {
+            yearlyIndex.push(i)
+        }
 
-        const percentageColumns: number[] = [1, 2, 5, 6, 7]; // Adjust column indices based on excel columns where % used
+        const percentageColumns: number[] = [1, 2, 5, 6, 7, ...yearlyIndex];
         percentageColumns.forEach(columnIndex => {
             const range = XLSX.utils.decode_range(worksheet['!ref']!);
             for (let i = range.s.r + 1; i <= range.e.r; i++) {
@@ -423,8 +393,8 @@ export class HomeComponent implements OnInit {
         let list: any[] = []
 
         this.outputList[0].years.forEach((element: any) => {
-            this.opHeaders.push(String(element));
-            this.opHeadersMapping.push(String(element));
+            this.opHeaders.push(String(" "+element));
+            this.opHeadersMapping.push(String(" "+element));
         });
         this.outputList.forEach((item) => {
             const obj: any = {}
@@ -445,12 +415,11 @@ export class HomeComponent implements OnInit {
                 key = item.years[number]
                 value = item.yearlyRetSum[item.years[number]]
                 number++;
-                obj[key] = Number(value).toFixed(2)
+                obj[" "+key] = Number(value/100 || 0.00)
             }
             list.push(obj);
         });
         return list
-
     }
 
     //This function should be display on the screen
