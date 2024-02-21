@@ -6,7 +6,7 @@ const TestValue = db.testValues;
 const Output = db.outputSheet;
 const calculateValues = require('./_helpers/calculateValues');
 
-const NUM_THREADS = os.cpus().length;
+const NUM_THREADS = (os.cpus().length / 2) + 2;
 
 const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPercent, stockId, isNewFormula) => {
   const yearsArray = stocks.map((stock) => {
