@@ -273,7 +273,7 @@ export class HomeComponent implements OnInit {
                     item.winPercent = Number(item.winPercent);
                     item.numberOfYears = Number(item.numberOfYears)
                 });
-                this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                this.exportToExcl(1, (stock.name as string) + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
             })
         }
     }
@@ -353,13 +353,13 @@ export class HomeComponent implements OnInit {
 
                 if (type == 3) {
                     if (this.isYearlySumEnabled) {
-                        let list = this.formatOPListForYearWise()
-                        this.exportToExcl(type, 'out_put.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                        let list:any[] = this.formatOPListForYearWise()
+                        this.exportToExcl(type, list[0].nameOfStock+'_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
                     } else {
                         this.formatOPList()
                         this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
                         this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
-                        this.exportToExcl(type, 'out_put.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                        this.exportToExcl(type, this.outputList[0].nameOfStock+'_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
                     }
                 }
 

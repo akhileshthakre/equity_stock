@@ -34,7 +34,7 @@
       <div class="back-test">
         <h2 class="pl-2 mb-1" style="flex-grow: 2;">Back Test</h2>
         <div class="mr-1">
-          <label class="switch">         
+          <label class="switch">
             <input type="checkbox" [(ngModel)]="isNewFormula">
             <span class="slider round"></span>
             <div>Use BP Variation</div>
@@ -44,7 +44,7 @@
           [disabled]="!testList.length && (!products.length || !stockData.length)"
           (click)="startBackTest(1)"></p-button>
       </div>
-    
+
       <form class="backTestForm" [formGroup]="backTestForm" class=" flex gap-1 pt-5">
         <div class="form-input">
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="SLOSS %" class="p-inputtext-sm"
@@ -78,11 +78,11 @@
         [rowsPerPageOptions]="[5,10, 25, 50]">
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="date" style="width:20%">Date </th>
-            <th pSortableColumn="open" style="width:20%">Open </th>
-            <th pSortableColumn="high" style="width:20%">High </th>
-            <th pSortableColumn="low" style="width:20%">Low </th>
-            <th pSortableColumn="price" style="width:20%">Close </th>
+            <th style="width:20%">Date </th>
+            <th style="width:20%">Open </th>
+            <th style="width:20%">High </th>
+            <th style="width:20%">Low </th>
+            <th style="width:20%">Close </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
@@ -109,8 +109,8 @@
         [rowsPerPageOptions]="[5,10, 25, 50]">
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="date" style="width:20%">Date </th>
-            <th pSortableColumn="name" style="width:20%">Name </th>
+            <th style="width:20%">Date </th>
+            <th style="width:20%">Name </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
@@ -136,9 +136,9 @@
         [rowsPerPageOptions]="[5,10, 25, 50] ">
         <ng-template pTemplate="header">
           <tr>
-            <th pSortableColumn="fallInStock">Fall in Stock </th>
-            <th pSortableColumn="limitLevel">Limit Level </th>
-            <th pSortableColumn="hldDay">Hld Day </th>
+            <th>Fall in Stock </th>
+            <th>Limit Level </th>
+            <th>Hld Day </th>
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
@@ -159,7 +159,7 @@
       <div class="stock-header">
         <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table</h2>
         <div class="mr-3">
-          <label class="switch">         
+          <label class="switch">
             <input type="checkbox" [(ngModel)]="isYearlySumEnabled">
             <span class="slider round"></span>
             <div>Add yearly summation</div>
@@ -173,14 +173,14 @@
       [rowsPerPageOptions]="[5,10, 25, 50]">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="nameOfStock"> Name <p-sortIcon field="nameOfStock"></p-sortIcon></th>
-          <th pSortableColumn="fallInStock">Fall in Stock <p-sortIcon field="fallInStock"></p-sortIcon></th>
-          <th pSortableColumn="limitLevel">LimitLevel <p-sortIcon field="limitLevel"></p-sortIcon></th>
-          <th pSortableColumn="hldDay">HoldingDay <p-sortIcon field="hldDay"></p-sortIcon></th>
-          <th pSortableColumn="totalDays">#OfDays <p-sortIcon field="totalDays"></p-sortIcon></th>
-          <th pSortableColumn="totalRetSum">TotalSum <p-sortIcon field="totalRetSum"></p-sortIcon></th>
-          <th pSortableColumn="avgGain">AvgGain <p-sortIcon field="avgGain"></p-sortIcon></th>
-          <th pSortableColumn="winPercent">Win% <p-sortIcon field="winPercent"></p-sortIcon></th>
+          <th> Name </th>
+          <th>Fall in Stock</th>
+          <th>LimitLevel </th>
+          <th>HoldingDay </th>
+          <th>#OfDays </th>
+          <th>TotalSum </th>
+          <th>AvgGain </th>
+          <th>Win% </th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-product>
@@ -209,15 +209,15 @@
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">
-        <h2 class="px-3 pt-3">Output Table</h2>
-        <div class="mr-3" style="margin-left: auto;">
-          <label class="switch">         
+        <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table</h2>
+        <div class="mr-3">
+          <label class="switch">
             <input type="checkbox" [(ngModel)]="isYearlySumEnabled">
             <span class="slider round"></span>
             <div>Add yearly summation</div>
           </label>
         </div>
-        <!-- <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="downloadInExcl()"></i> -->
+        <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;" (click)="downloadInExcl()"></i>
       </div>
     </ng-template>
     <p-table [value]="outputData" [paginator]="outputData.length > 5" [rows]="5"
@@ -225,8 +225,8 @@
       [rowsPerPageOptions]="[5,10, 25, 50]">
       <ng-template pTemplate="header">
         <tr>
-          <th pSortableColumn="name"> Name </th>
-          <th pSortableColumn="index">Download </th>
+          <th> Name </th>
+          <th>Download </th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-product>
