@@ -302,28 +302,33 @@ export class HomeComponent implements OnInit {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
             if (resp) {
-                let list:any = [].concat(...resp.data)              
+               // let list:any = [].concat(...resp.data)  
+                resp.data.forEach((list:any) => {                    
+                    if (this.isYearlySumEnabled) {
+                        let data = this.formatOPListForYearWise(list)
+                        this.exportToExcl(1,  data[0].nameOfStock+'_Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
+        
+                    } else {
+                        list.map((item :any) => {
+                            delete item.numberOfUpMoves;
+                            delete item.numberOfDownMoves;
+                            item.fallInStock = Number(item.fallInStock);
+                            item.limitLevel = Number(item.limitLevel);
+                            item.hldDay = Number(item.hldDay);
+                            item.totalRetSum = Number(item.totalRetSum);
+                            item.avgGain = Number(item.avgGain);
+                            item.winPercent = Number(item.winPercent);
+                            item.numberOfYears = Number(item.numberOfYears)
+                        });
+                        this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                        this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                        this.exportToExcl(1, list[0].nameOfStock+'_OutPut.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                    } 
+
+                    
+                });            
              
-                if (this.isYearlySumEnabled) {
-                    let data = this.formatOPListForYearWise(list)
-                    this.exportToExcl(1,  'Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
-    
-                } else {
-                    list.map((item :any) => {
-                        delete item.numberOfUpMoves;
-                        delete item.numberOfDownMoves;
-                        item.fallInStock = Number(item.fallInStock);
-                        item.limitLevel = Number(item.limitLevel);
-                        item.hldDay = Number(item.hldDay);
-                        item.totalRetSum = Number(item.totalRetSum);
-                        item.avgGain = Number(item.avgGain);
-                        item.winPercent = Number(item.winPercent);
-                        item.numberOfYears = Number(item.numberOfYears)
-                    });
-                    this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
-                    this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
-                    this.exportToExcl(1, 'OutPut.xlsx', list, this.opHeaders, this.opHeadersMapping)
-                } 
+                
             }
         })
     }
