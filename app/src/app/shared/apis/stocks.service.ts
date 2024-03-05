@@ -114,7 +114,7 @@ export class StocksApiService {
       catchError(this.handleError)
     );
   }
-  calculateOutPut(payload: any) {
+  calculateOutPut(payload: any):Observable<any> {
     return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.CALCULATE}`, payload).pipe(map((res: any) => {
       if (res) {
         return res;
