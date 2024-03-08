@@ -9,12 +9,13 @@ import { FileUploadModule } from 'primeng/fileupload';
 import { ToastModule } from 'primeng/toast';
 import { CardModule } from 'primeng/card';
 import { TableModule } from 'primeng/table';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { InputTextModule } from 'primeng/inputtext';
 import { SharedModule } from '../shared/shared.module'; 
 import { ProgressSpinnerModule } from 'primeng/progressspinner'; 
 import { AuthGuardService } from '../shared/guards/auth-guard.service';
 import { ExecutionComponent } from './components/execution/execution.component';
+
 
 @NgModule({
   declarations: [
@@ -33,6 +34,7 @@ import { ExecutionComponent } from './components/execution/execution.component';
     ReactiveFormsModule,
     InputTextModule,
     SharedModule,
+    FormsModule,
     ProgressSpinnerModule, 
   ],
   providers : [AuthGuardService]

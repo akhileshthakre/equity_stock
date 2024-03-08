@@ -22,11 +22,13 @@ export class HomeComponent implements OnInit {
     productsHeadersMapping: string[] = ['period', 'price', 'high', 'low', 'open']
     testHeaders: string[] = ['Fall in stock', 'Limit level', 'Holding Day']
     testHeadersMapping: string[] = ['fallInStock', 'limitLevel', 'hldDay']
-    opHeaders: string[] = ['Stock name ', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %']
-    opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent']
+    opHeaders: string[] = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+    opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
     pageNumber: number = 0;
     fileCount: number = 0
     data: any;
+    isNewFormula: boolean = false
+    isYearlySumEnabled: boolean = false
     showOutPutTable: boolean = false
     options: any;
     uploadedFiles: any[] = [];
@@ -49,6 +51,8 @@ export class HomeComponent implements OnInit {
         //this.getTestValuesFile()
     }
 
+
+
     get slossPercentControl() {
         return this.backTestForm.get('slossPercent')
     }
@@ -60,12 +64,12 @@ export class HomeComponent implements OnInit {
     }
 
     onUpload(event: UploadEvent, fileUpload: any) {
-        this.spinnerService.showSpinner(true)
-        console.log(event)
+        this.spinnerService.showSpinner(true) 
         for (let file of event.files) {
             this.uploadedFiles.push(file);
         }
         this.products = []
+        this.stockData = []
         this._stockService.deleteAllStockList().pipe(switchMap((val) =>
             this._stockService.uploadStockXlsxFile(this.uploadedFiles)
         ))
@@ -200,11 +204,13 @@ export class HomeComponent implements OnInit {
     }
 
     exportToExcl(type: number, fileName: string, data: any, headers: string[], mappingHeaders: string[]) {
+
+
         const mappedData = data.map((item: any) => {
             const mappedItem: any = {};
             mappingHeaders.forEach((fieldMap, index) => {
                 let value = item[fieldMap];
-                if (value !== undefined && value !== null) {
+                if (value) {
                     mappedItem[headers[index]] = value;
                 } else {
                     mappedItem[headers[index]] = null;
@@ -213,9 +219,14 @@ export class HomeComponent implements OnInit {
             return mappedItem;
         });
 
-        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
 
-        const percentageColumns: number[] = [1, 2, 5, 6, 7]; // Adjust column indices based on excel columns where % used
+        const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
+        const yearlyIndex = []
+        for (let i = 9; i <= headers.length; i++) {
+            yearlyIndex.push(i)
+        }
+
+        const percentageColumns: number[] = [1, 2, 5, 6, 7, ...yearlyIndex];
         percentageColumns.forEach(columnIndex => {
             const range = XLSX.utils.decode_range(worksheet['!ref']!);
             for (let i = range.s.r + 1; i <= range.e.r; i++) {
@@ -248,32 +259,91 @@ export class HomeComponent implements OnInit {
         if (stock) {
             const obj = {
                 downloadAll: true,
-                stockId: stock.name
+                stockId: stock.name,
+                isYearlySumEnabled: this.isYearlySumEnabled
             }
             this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
                 this.spinnerService.showSpinner(false)
                 let list: any[] = [].concat(...resp.data)
-                list.map((item: any) => { 
-                    item.fallInStock = Number(item.fallInStock);
-                    item.limitLevel = Number(item.limitLevel);
-                    item.hldDay = Number(item.hldDay);
-                    item.totalRetSum = Number(item.totalRetSum);
-                    item.avgGain = Number(item.avgGain);
-                    item.winPercent = Number(item.winPercent);
-                });
-                this.exportToExcl(1, (stock.name as string) + '.xlsx', list, this.opHeaders, this.opHeadersMapping)
+
+                if (this.isYearlySumEnabled) {
+                    let data: any[] = this.formatOPListForYearWise(list)
+                    this.exportToExcl(1, data[0].nameOfStock + '_Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
+                } else {
+                    this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                    this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                    list.map((item: any) => {
+                        item.fallInStock = Number(item.fallInStock);
+                        item.limitLevel = Number(item.limitLevel);
+                        item.hldDay = Number(item.hldDay);
+                        item.totalRetSum = Number(item.totalRetSum);
+                        item.avgGain = Number(item.avgGain);
+                        item.winPercent = Number(item.winPercent);
+                        item.numberOfYears = Number(item.numberOfYears)
+                    });
+                    this.exportToExcl(1, (stock.name as string) + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                }
+
             })
         }
     }
 
-    downloadInExcl() {
+    downloadInExclForAll() {
         const obj: any = {
-            "downloadAll": true
+            downloadAll: true,
+            isNewFormula: this.isNewFormula,
+            isYearlySumEnabled: this.isYearlySumEnabled,
+        }
+        if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
+        if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
+        if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value 
+        this.spinnerService.showSpinner(true)
+        this._stockService.calculateOutPut(obj).subscribe((resp: any) => { 
+            this.spinnerService.showSpinner(false)
+            this.backTestForm.reset()
+            if (resp) {
+               // let list:any = [].concat(...resp.data)  
+                resp.data.forEach((list:any) => {                    
+                    if (this.isYearlySumEnabled) {
+                        let data = this.formatOPListForYearWise(list)
+                        this.exportToExcl(1,  data[0].nameOfStock+'_Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
+        
+                    } else {
+                        list.map((item :any) => {
+                            delete item.numberOfUpMoves;
+                            delete item.numberOfDownMoves;
+                            item.fallInStock = Number(item.fallInStock);
+                            item.limitLevel = Number(item.limitLevel);
+                            item.hldDay = Number(item.hldDay);
+                            item.totalRetSum = Number(item.totalRetSum);
+                            item.avgGain = Number(item.avgGain);
+                            item.winPercent = Number(item.winPercent);
+                            item.numberOfYears = Number(item.numberOfYears)
+                        });
+                        this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                        this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                        this.exportToExcl(1, list[0].nameOfStock+'_OutPut.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                    } 
+
+                    
+                });            
+             
+                
+            }
+        })
+    }
+
+    downloadInExcl() {
+        let type: number = 3
+        const obj: any = {
+            downloadAll: true,
+            isNewFormula: this.isNewFormula,
+            isYearlySumEnabled: this.isYearlySumEnabled,
         }
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
         if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value
-        this.calOutPut(obj, 3)
+        this.calOutPut(obj, type)
     }
 
 
@@ -282,6 +352,7 @@ export class HomeComponent implements OnInit {
         if (type) this.pageNumber = 1;
         const obj: any = {
             page: this.pageNumber,
+            isNewFormula: this.isNewFormula
         }
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
@@ -290,14 +361,14 @@ export class HomeComponent implements OnInit {
     }
 
     calOutPut(obj: any, type?: number) {
+
         this.outputData = []
         this.outputList = []
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
-            if (resp) {
-                console.log(resp)
+            if (resp) { 
                 if (this.fileCount < 2) {
                     this.outputList = [].concat(...resp.data)
 
@@ -314,15 +385,16 @@ export class HomeComponent implements OnInit {
                     setTimeout(() => {
                         let index = 0
                         Object.entries(groupedData).forEach(([key, value]) => {
-                            (value as Array<any>).map((item: any) => {  
+                            (value as Array<any>).map((item: any) => {
                                 item.fallInStock = Number(item.fallInStock);
                                 item.limitLevel = Number(item.limitLevel);
                                 item.hldDay = Number(item.hldDay);
                                 item.totalRetSum = Number(item.totalRetSum);
                                 item.avgGain = Number(item.avgGain);
                                 item.winPercent = Number(item.winPercent);
-                            });
-                            console.log(value)
+                                item.numberOfYears = Number(item.numberOfYears)
+
+                            }); 
                             let data = {
                                 name: key,
                                 opData: value,
@@ -335,11 +407,19 @@ export class HomeComponent implements OnInit {
 
 
                 if (type == 3) {
-                    this.formatOPList()
-                    this.exportToExcl(type, 'out_put.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                    if (this.isYearlySumEnabled) {
+                        let list: any[] = this.formatOPListForYearWise(this.outputList)
+                        this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                    } else {
+                        this.formatOPList()
+                        this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                        this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                        this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                    }
                 }
+
                 this.formatDisplayOPList()
-                this.showOutPutTable = true           
+                this.showOutPutTable = true
 
             } else {
                 this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
@@ -360,20 +440,55 @@ export class HomeComponent implements OnInit {
             item.totalRetSum = Number(item.totalRetSum);
             item.avgGain = Number(item.avgGain);
             item.winPercent = Number(item.winPercent);
+            item.numberOfYears = Number(item.numberOfYears)
         });
+    }
+    formatOPListForYearWise(out_put_list: any[]): any[] {
+        let list: any[] = []
+
+        out_put_list[0].years.forEach((element: any) => {
+            this.opHeaders.push(String(" " + element));
+            this.opHeadersMapping.push(String(" " + element));
+        });
+        out_put_list.forEach((item) => {
+            const obj: any = {}
+            obj['nameOfStock'] = String(item.nameOfStock);
+            obj['fallInStock'] = Number(item.fallInStock);
+            obj['limitLevel'] = Number(item.limitLevel);
+            obj['hldDay'] = Number(item.hldDay);
+            obj['totalRetSum'] = Number(item.totalRetSum);
+            obj['avgGain'] = Number(item.avgGain);
+            obj['winPercent'] = Number(item.winPercent);
+            obj['totalDays'] = Number(item?.totalDays);
+            obj['numberOfYears'] = Number(item.numberOfYears);
+            let number: number = 0;
+            let key: any = '';
+            let value: any = ''
+
+            while (number <= item.years.length) {
+                key = item.years[number]
+                value = item.yearlyRetSum[item.years[number]]
+                number++;
+                obj[" " + key] = Number(value / 100 || 0.00)
+            }
+            list.push(obj);
+        });
+        return list
     }
 
     //This function should be display on the screen
     formatDisplayOPList() {
         this.outputList.map((item) => {
             delete item.numberOfUpMoves;
-            delete item.numberOfDownMoves; 
+            delete item.numberOfDownMoves;
             item.fallInStock = this.formatPercentage(Number(item.fallInStock * 100));
             item.limitLevel = this.formatPercentage(Number(item.limitLevel * 100));
             item.hldDay = Number(item.hldDay);
             item.totalRetSum = this.formatPercentage(Number(item.totalRetSum * 100));
             item.avgGain = this.formatPercentage(Number(item.avgGain * 100));
             item.winPercent = this.formatPercentage(Number(item.winPercent * 100));
+            item.numberOfYears = Number(item.numberOfYears)
+
         });
     }
 

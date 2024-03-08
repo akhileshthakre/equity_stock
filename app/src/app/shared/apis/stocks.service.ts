@@ -41,7 +41,7 @@ export class StocksApiService {
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
-    console.log(payload)
+    //console.log(payload)
     for (var x = 0; x < payload.length; x++) {
       formData.append("file", payload[x]);
     }
@@ -114,7 +114,7 @@ export class StocksApiService {
       catchError(this.handleError)
     );
   }
-  calculateOutPut(payload: any) {
+  calculateOutPut(payload: any):Observable<any> {
     return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.CALCULATE}`, payload).pipe(map((res: any) => {
       if (res) {
         return res;
