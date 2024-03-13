@@ -36,6 +36,7 @@ export class HomeComponent implements OnInit {
     showOutPutTable: boolean = false
     options: any;
     uploadedFiles: any[] = [];
+    stocks: any[] = [];
     uploadedTestValues: any[] = [];
     products: any[] = []
     stockData: any[] = []
@@ -381,11 +382,65 @@ export class HomeComponent implements OnInit {
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
-            if (resp) {
-                if (this.fileCount < 2) {
-                    this.outputList = [].concat(...resp.data)
+            if (!this.isSearchStock) {
+                if (resp) {
+                    if (this.fileCount < 2) {
+                        this.outputList = [].concat(...resp.data)
+
+                    } else {
+                        let list = [].concat(...resp.data)
+                        const groupedData: any = {};
+                        list.forEach((item: any) => {
+                            const stockName = item.nameOfStock;
+                            if (!groupedData[stockName]) {
+                                groupedData[stockName] = [];
+                            }
+                            groupedData[stockName].push(item);
+                        });
+                        setTimeout(() => {
+                            let index = 0
+                            Object.entries(groupedData).forEach(([key, value]) => {
+                                (value as Array<any>).map((item: any) => {
+                                    item.fallInStock = Number(item.fallInStock);
+                                    item.limitLevel = Number(item.limitLevel);
+                                    item.hldDay = Number(item.hldDay);
+                                    item.totalRetSum = Number(item.totalRetSum);
+                                    item.avgGain = Number(item.avgGain);
+                                    item.winPercent = Number(item.winPercent);
+                                    item.numberOfYears = Number(item.numberOfYears)
+
+                                });
+                                let data = {
+                                    name: key,
+                                    opData: value,
+                                    index: ++index
+                                }
+                                this.outputData.push(data)
+                            });
+                        }, 0);
+                    }
+
+
+                    if (type == 3) {
+                        if (this.isYearlySumEnabled) {
+                            let list: any[] = this.formatOPListForYearWise(this.outputList)
+                            this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                        } else {
+                            this.formatOPList()
+                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                            this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                        }
+                    }
+
+                    this.formatDisplayOPList()
+                    this.showOutPutTable = true
 
                 } else {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
+                }
+            } else {
+                if (this.stocks.length > 1) {
                     let list = [].concat(...resp.data)
                     const groupedData: any = {};
                     list.forEach((item: any) => {
@@ -416,27 +471,24 @@ export class HomeComponent implements OnInit {
                             this.outputData.push(data)
                         });
                     }, 0);
-                }
-
-
-                if (type == 3) {
-                    if (this.isYearlySumEnabled) {
-                        let list: any[] = this.formatOPListForYearWise(this.outputList)
-                        this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
-                    } else {
-                        this.formatOPList()
-                        this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
-                        this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
-                        this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                } else {
+                    this.outputList = [].concat(...resp.data)
+                    if (type == 3) {
+                        if (this.isYearlySumEnabled) {
+                            let list: any[] = this.formatOPListForYearWise(this.outputList)
+                            this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                        } else {
+                            this.formatOPList()
+                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
+                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                            this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
+                        }
                     }
+                    this.formatDisplayOPList()
+                    this.showOutPutTable = true
                 }
-
-                this.formatDisplayOPList()
-                this.showOutPutTable = true
-
-            } else {
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed' });
             }
+
         }, (err: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
@@ -520,11 +572,12 @@ export class HomeComponent implements OnInit {
 
 
     searchStock() {
-        let stocks: any[] = this.searchStocks.split(',').map(item => item.trim()) 
-        let maxdate = this.datePipe.transform(this.maxDate, 'yyyy-MM-dd') 
-        if (stocks) {
+        this.spinnerService.showSpinner(true)
+        this.stocks = this.searchStocks.split(',').map(item => item.trim())
+        let maxdate = this.datePipe.transform(this.maxDate, 'yyyy-MM-dd')
+        if (this.stocks) {
             const payload = {
-                symbols: stocks,
+                symbols: this.stocks,
                 startDate: this.datePipe.transform(this.dateRange[0], 'yyyy-MM-dd'),
                 endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate
             }
@@ -535,11 +588,11 @@ export class HomeComponent implements OnInit {
             this.showOutPutTable = true
             this._stockService.deleteAllStockList().pipe(switchMap((val) =>
                 this._stockService.searchStock(payload)
-            )).subscribe((resp: any) => { 
-
+            )).subscribe((resp: any) => {
+                this.spinnerService.showSpinner(false)
                 if (!resp['error']) {
-                    if (stocks.length > 1) {
-                        stocks.forEach((element: string) => {
+                    if (this.stocks.length > 1) {
+                        this.stocks.forEach((element: string) => {
                             const obj = {
                                 date: new Date(),
                                 name: element
