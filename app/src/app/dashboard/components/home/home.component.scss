@@ -1,8 +1,9 @@
 .main {
-    max-width: 90%;
-    margin: auto;
+  max-width: 90%;
+  margin: auto;
 }
-.switch div{
+
+.switch div {
   z-index: 1;
   color: #27ae60;
   font-weight: 700;
@@ -10,133 +11,117 @@
 }
 
 .stock-header {
-    display: flex;
-    width: 90%;
-    margin: auto;
-    align-items: center;
+  display: flex;
+  width: 90%;
+  margin: auto;
+  align-items: center;
+}
+
+.upload-stock-block {
+  display: flex;
+  justify-content: space-between;
+}
+.upload-stock-block div {
+  margin-top: 5px;
+  margin-right: 5px;
 }
 
 td,
 th {
-    text-align: center !important;
+  text-align: center !important;
+}
+.date-range-footer{
+  margin: 10px;
+  float: right;
 }
 
 .back-test {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-
-// .backTestForm{
-//     display: flex;
-//     gap: 3px;
-// }
-// .back-test p-button {
-//     position: relative;
-//     bottom: 5px;
-// }
-
-// .back-test p-button :hover{
-//  background: #0F6CB0;
-// }
 
  
 
-// .overlay{
-//     position:fixed !important;
-//     top: 0;
-//     left: 0;
-//     width: 100% !important;
-//     height: 100% !important;
-//     z-index: 100; /* this seems to work for me but may need to be higher*/
-//     background-color: black;
-//     opacity: 0.5;
-//     margin: auto;
-// }
+ 
+
+.switch { 
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 24px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider+div {
+  display: none;
+}
+
+.slider:hover+div {
+  position: absolute;
+  display: flex;
+  padding-top: 10px;
+}
 
 
-.switch {
-    // position: relative;
-    // display: inline-block;
-    // width: 60px;
-    // height: 34px;
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 4px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
 
-    position: relative;
-    display: inline-block;
-    width: 51px;
-    height: 24px;
-  }
-  
-  .switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  .slider+div {
-    display: none;
-  }
+}
 
-  .slider:hover+div {
-    position: absolute;
-    display: flex;
-    padding-top: 10px;
-    }
-  
-  
-  .slider:before {
-    // position: absolute;
-    // content: "";
-    // height: 26px;
-    // width: 26px;
-    // left: 4px;
-    // bottom: 4px;
-    // background-color: white;
-    // -webkit-transition: .4s;
-    // transition: .4s;
+input:checked+.slider {
+  background-color: #27ae60;
+}
 
-    position: absolute;
-    content: "";
-    height: 18px;
-    width: 18px;
-    left: 4px;
-    bottom: 3px;
-    background-color: white;
-    transition: 0.4s;
+input:focus+.slider {
+  box-shadow: 0 0 1px #27ae60;
+}
 
-  }
-  
-  input:checked + .slider {
-    background-color: #27ae60;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #27ae60;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
-  }
-  
-  /* Rounded sliders */
-  .slider.round {
-    border-radius: 34px;
-  }
-  
-  .slider.round:before {
-    border-radius: 50%;
-  }
+input:checked+.slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+
+.stockSearchForm-inputs{
+  display: flex;
+  gap: 7px;
+  margin: 18px 0;
+}
+.stockSearchForm-btn{
+  display: flex;
+  justify-content: center;
+}

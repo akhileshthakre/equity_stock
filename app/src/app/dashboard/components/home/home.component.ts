@@ -1,5 +1,6 @@
+import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MessageService } from 'primeng/api';
 import { switchMap } from 'rxjs';
 import { StocksApiService } from 'src/app/shared/apis/stocks.service';
@@ -25,8 +26,11 @@ export class HomeComponent implements OnInit {
     opHeaders: string[] = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
     opHeadersMapping: string[] = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
     pageNumber: number = 0;
+    datePipe: DatePipe = new DatePipe("en-US");
     fileCount: number = 0
     data: any;
+    searchStocks: string = ''
+    dateRange: any = ''
     isNewFormula: boolean = false
     isYearlySumEnabled: boolean = false
     showOutPutTable: boolean = false
@@ -38,11 +42,17 @@ export class HomeComponent implements OnInit {
     testList: any[] = []
     outputList: any[] = []
     outputData: any[] = []
+    maxDate: Date = new Date()
     backTestForm: FormGroup = this.formBuilder.group({
         slossPercent: [],
         tgPercent: [],
         tsPercent: [],
     })
+    stockSearchForm: FormGroup = this.formBuilder.group({
+        searchStocks: ['', Validators.required],
+        dateRange: ['', Validators.required]
+    })
+    isSearchStock: boolean = false;
 
     constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
 
@@ -62,9 +72,13 @@ export class HomeComponent implements OnInit {
     get tsPercentControl() {
         return this.backTestForm.get('tsPercent')
     }
+    getDateRange(event: any, calendar: any) {
+        calendar.overlayVisible = false;
+        console.log(this.dateRange)
+    }
 
     onUpload(event: UploadEvent, fileUpload: any) {
-        this.spinnerService.showSpinner(true) 
+        this.spinnerService.showSpinner(true)
         for (let file of event.files) {
             this.uploadedFiles.push(file);
         }
@@ -296,20 +310,20 @@ export class HomeComponent implements OnInit {
         }
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
-        if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value 
+        if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value
         this.spinnerService.showSpinner(true)
-        this._stockService.calculateOutPut(obj).subscribe((resp: any) => { 
+        this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
             if (resp) {
-               // let list:any = [].concat(...resp.data)  
-                resp.data.forEach((list:any) => {                    
+                // let list:any = [].concat(...resp.data)  
+                resp.data.forEach((list: any) => {
                     if (this.isYearlySumEnabled) {
                         let data = this.formatOPListForYearWise(list)
-                        this.exportToExcl(1,  data[0].nameOfStock+'_Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
-        
+                        this.exportToExcl(1, data[0].nameOfStock + '_Output.xlsx', data, this.opHeaders, this.opHeadersMapping)
+
                     } else {
-                        list.map((item :any) => {
+                        list.map((item: any) => {
                             delete item.numberOfUpMoves;
                             delete item.numberOfDownMoves;
                             item.fallInStock = Number(item.fallInStock);
@@ -322,13 +336,13 @@ export class HomeComponent implements OnInit {
                         });
                         this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Days', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
                         this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
-                        this.exportToExcl(1, list[0].nameOfStock+'_OutPut.xlsx', list, this.opHeaders, this.opHeadersMapping)
-                    } 
+                        this.exportToExcl(1, list[0].nameOfStock + '_OutPut.xlsx', list, this.opHeaders, this.opHeadersMapping)
+                    }
 
-                    
-                });            
-             
-                
+
+                });
+
+
             }
         })
     }
@@ -361,14 +375,13 @@ export class HomeComponent implements OnInit {
     }
 
     calOutPut(obj: any, type?: number) {
-
         this.outputData = []
         this.outputList = []
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
             this.backTestForm.reset()
-            if (resp) { 
+            if (resp) {
                 if (this.fileCount < 2) {
                     this.outputList = [].concat(...resp.data)
 
@@ -394,7 +407,7 @@ export class HomeComponent implements OnInit {
                                 item.winPercent = Number(item.winPercent);
                                 item.numberOfYears = Number(item.numberOfYears)
 
-                            }); 
+                            });
                             let data = {
                                 name: key,
                                 opData: value,
@@ -503,5 +516,47 @@ export class HomeComponent implements OnInit {
             ++this.pageNumber;
             this.startBackTest()
         }
+    }
+
+
+    searchStock() {
+        let stocks: any[] = this.searchStocks.split(',').map(item => item.trim()) 
+        let maxdate = this.datePipe.transform(this.maxDate, 'yyyy-MM-dd') 
+        if (stocks) {
+            const payload = {
+                symbols: stocks,
+                startDate: this.datePipe.transform(this.dateRange[0], 'yyyy-MM-dd'),
+                endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate
+            }
+            this.products = []
+            this.stockData = []
+            this.outputList = []
+            this.outputData = []
+            this.showOutPutTable = true
+            this._stockService.deleteAllStockList().pipe(switchMap((val) =>
+                this._stockService.searchStock(payload)
+            )).subscribe((resp: any) => { 
+
+                if (!resp['error']) {
+                    if (stocks.length > 1) {
+                        stocks.forEach((element: string) => {
+                            const obj = {
+                                date: new Date(),
+                                name: element
+                            }
+                            this.stockData.push(obj);
+                        });
+                    } else {
+                        this.products = resp
+                        this.formatProducts()
+                    }
+
+                } else {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: resp['error'] });
+                }
+
+            })
+        }
+
     }
 }

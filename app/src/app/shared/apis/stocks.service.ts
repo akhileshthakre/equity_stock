@@ -123,6 +123,15 @@ export class StocksApiService {
       , catchError(this.handleError)
     )
   }
+  searchStock(payload: any):Observable<any> {
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.SEARCH_STOCK}`, payload).pipe(map((res: any) => {
+      if (res) {
+        return res;
+      }
+    })
+      , catchError(this.handleError)
+    )
+  }
 
 
 }

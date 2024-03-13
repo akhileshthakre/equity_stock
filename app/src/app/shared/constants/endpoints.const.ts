@@ -9,6 +9,7 @@ export const END_POINT_CONST = {
         DELETE_TEST_LIST: '/testValue/deleteAllTestValues',
         GET_ALL_TEST_VALUES: '/testValue',
         CALCULATE: '/calculation',
+        SEARCH_STOCK: '/searchStock',
         GET_USER: '/user'
     },
     EXECUTION: {
