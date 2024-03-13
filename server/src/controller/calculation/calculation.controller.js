@@ -137,25 +137,6 @@ const CalculationService = {
           userId: userId,
         }));
       
-        // if(downloadAll) {
-        //   const formattedData = flattenedResults.map(data => ({
-        //     nameOfStock: data.nameOfStock,
-        //     fallInStock: data.fallInStock,
-        //     limitLevel: data.limitLevel,
-        //     hldDay: data.hldDay,
-        //     numberOfUpMoves: data.numberOfUpMoves,
-        //     numberOfDownMoves: data.numberOfDownMoves,
-        //     totalDays: data.totalDays,
-        //     totalRetSum: data.totalRetSum,
-        //     avgGain: data.avgGain,
-        //     winPercent: data.winPercent,
-        //     numberOfYears: data.numberOfYears,
-        //     yearlyRetSum: data.yearlyRetSum,
-        //     userId: userId,
-        //   }));
-        //   await Output.bulkCreate(formattedData, { updateOnDuplicate: Object.keys(formattedData[0]) });
-        // }
-      
         results.push(finalOutput);
       }
 

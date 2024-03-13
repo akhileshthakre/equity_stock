@@ -35,7 +35,7 @@ const SearchController = {
         res.json(allResults);
     } catch (error) {
         console.error('Error retrieving stock data:', error); // Improved error logging
-        res.status(500).send('Error retrieving stock data');
+        res.status(404).send({error: 'Error retrieving stock data'});
     }
   }
 }
