@@ -15,6 +15,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
         const stockFile = path.find(item => item === 'stockFile');
         const testFile = path.find(item => item === 'testFile');
         const executionFile = path.find(item => item === 'executionFile');
+        const allStockSymbols = path.find(item => item === 'allStockSymbols');
 
 
         if(stockFile) {
@@ -43,6 +44,11 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
             await workbook.xlsx.load(file.buffer);
             const worksheet = workbook.worksheets[0];
             await processAndSyncData(userId, worksheet, 'executionFile', 'executionSheet');
+            res.status(200).json({ message: 'File uploaded and database updated successfully' });
+        }else if(allStockSymbols) {
+            await workbook.xlsx.load(file.buffer);
+            const worksheet = workbook.worksheets[0];
+            await processAndSyncData(userId, worksheet, 'allStockSymbols', 'allStockSymbolsFile');
             res.status(200).json({ message: 'File uploaded and database updated successfully' });
         }
 

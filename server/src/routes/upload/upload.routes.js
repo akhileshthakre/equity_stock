@@ -17,6 +17,10 @@ router.post('/testFile', authenticateToken, upload.single('file'), (req, res) =>
 router.post('/executionFile', authenticateToken, upload.single('file'), (req, res) => {
   UploadController.upload(req, req.file, res);
 });
+
+router.post('/allStockSymbols', authenticateToken, upload.single('file'), (req, res) => {
+  UploadController.upload(req, req.file, res);
+});
   
 
 module.exports = router;
