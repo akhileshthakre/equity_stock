@@ -1,4 +1,5 @@
 const db = require('../model');
+const { Op } = require('sequelize');
 const moment = require('moment');
 const StockSymbols = db.stockSymbols;
 const Stock = db.stocks;
@@ -44,9 +45,17 @@ const SearchController = {
   downloadAllStocks: async (req, res) => {
     try {
         const userId = req.user.userId; 
+
         const stocks = await StockSymbols.findAll({
-            where: { userId },
+            where: {
+                userId,
+                stocks: {
+                    [Op.ne]: '',
+                    [Op.not]: null
+                }
+            },
         });
+        
 
         let allResults = [];
         const today = moment().format("YYYY-MM-DD");
@@ -58,10 +67,6 @@ const SearchController = {
         }
 
         const formattedYesterday = yesterday.format("YYYY-MM-DD");
-
-        console.log("Today:", today, "Yesterday:", formattedYesterday);
-
-        console.log(today, formattedYesterday);
 
         for (const row of stocks) {
             const queryOptions = { period1: formattedYesterday, period2: today };
@@ -82,7 +87,10 @@ const SearchController = {
         res.json(allResults);
     } catch (error) {
         console.error('Error retrieving stock data:', error);
-        res.status(500).send({ error: 'Error retrieving stock data. Please check stock symbols.' });
+        res.status(200).send({ 
+            message: 'Error retrieving stock data. Please check stock symbols.' ,
+            success: 'false'
+    });
     }
 }
 

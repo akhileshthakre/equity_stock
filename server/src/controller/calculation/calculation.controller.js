@@ -105,7 +105,8 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
           if (values.length === 0 || values.some(value => typeof value !== 'number' || isNaN(value))) {
               return 0
           }
-          return Math.min(...values)
+          const maxNegavtivePercent =  Math.min(...values) / 100
+          return roundToDecimalPlaces(maxNegavtivePercent)
       } catch (error) {
           return 0
       }
