@@ -14,6 +14,7 @@ import {AvatarModule} from 'primeng/avatar';
 import {BadgeModule} from 'primeng/badge';
 import { FileUploadModule } from 'primeng/fileupload';
 import { AuthGuardService } from '../shared/guards/auth-guard.service';
+import { DialogModule } from 'primeng/dialog';
 // import { NgxSpinnerModule } from 'ngx-spinner';
 
 @NgModule({
@@ -33,7 +34,7 @@ import { AuthGuardService } from '../shared/guards/auth-guard.service';
     DividerModule,
     AvatarModule,
     BadgeModule,
-    FileUploadModule, 
+    FileUploadModule, DialogModule
   ],providers:[AuthGuardService]
 })
 export class CoreModule { }

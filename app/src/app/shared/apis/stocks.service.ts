@@ -54,6 +54,24 @@ export class StocksApiService {
       catchError(this.handleError)
     );
   }
+  uploadStocksSymbols(payload: any) {
+    let params = new HttpParams();
+    const headers = new HttpHeaders();
+    headers.set('Accept', "multipart/form-data");
+    const formData = new FormData();
+    //console.log(payload)
+    for (var x = 0; x < payload.length; x++) {
+      formData.append("file", payload[x]);
+    }
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS_SYMBOLS.UPLOAD_STOCK_SYMBOLS}`, formData, { params, headers }).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
   uploadTestValuesXlsxFile(payload: any) {
     let params = new HttpParams();
     const headers = new HttpHeaders();
@@ -74,6 +92,16 @@ export class StocksApiService {
 
   getAllStockInfo() {
     return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.GET_ALL_STOCKS}`).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+  getAllStockSymbols() {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS_SYMBOLS.GET_STOCK_SYMBOLS}`).pipe(
       map((res: any) => {
         if (res) {
           return res;

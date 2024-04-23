@@ -23,11 +23,12 @@
         <div class="stockSearchForm-inputs">
           <span class="p-input-icon-right">
             <i class="pi pi-search"></i>
-            <input type="text" placeholder="Search Stock" pInputText [(ngModel)]="searchStocks" formControlName="searchStocks" />
+            <input type="text" placeholder="Search Stock" pInputText [(ngModel)]="searchStocks"
+              formControlName="searchStocks" />
           </span>
           <div class="card flex justify-content-center">
-            <p-calendar #calender [(ngModel)]="dateRange" [maxDate]="maxDate" selectionMode="range" formControlName="dateRange"
-              [showIcon]="true" [readonlyInput]="true">
+            <p-calendar #calender [(ngModel)]="dateRange" [maxDate]="maxDate" selectionMode="range"
+              formControlName="dateRange" [showIcon]="true" [readonlyInput]="true">
               <ng-template pTemplate="footer">
                 <div class="date-range-footer">
                   <p-button label="Ok" (click)="getDateRange($event, calender)"></p-button>
@@ -37,7 +38,8 @@
           </div>
         </div>
         <div class="stockSearchForm-btn">
-          <p-button type="submit" label="Search Stock" [disabled]="!stockSearchForm.valid || dateRange.length == 1" (click)="searchStock()"></p-button>
+          <p-button type="submit" label="Search Stock" [disabled]="!stockSearchForm.valid || dateRange.length == 1"
+            (click)="searchStock()"></p-button>
         </div>
       </form>
     </ng-container>
@@ -113,10 +115,10 @@
       <ng-template pTemplate="header">
         <div class="stock-header">
           <h2 class="px-3 pt-3">Stock Table</h2>
-          <!-- <i class="pi pi-download" style="font-size: 1.5rem;cursor: pointer" (click)="exceldownload(1)"></i> -->
+          <i *ngIf="isSearchStock"  class="pi pi-download" style="font-size: 1.5rem;cursor: pointer;margin-left: auto;"
+            (click)="downloadSearchStocks()"></i>
         </div>
       </ng-template>
-      <!-- [tableStyle]="{'min-width': '60rem'}" -->
       <p-table [value]="products" [paginator]="products.length > 5" [rows]="5"
         currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
         [rowsPerPageOptions]="[5,10, 25, 50]">
@@ -132,8 +134,8 @@
         <ng-template pTemplate="body" let-product>
           <tr>
             <td>{{product.period | date:'dd-MM-yyyy'}}</td>
-            <td>{{product.open  | number : '1.2-2'}}</td>
-            <td>{{product.high  | number : '1.2-2'}}</td>
+            <td>{{product.open | number : '1.2-2'}}</td>
+            <td>{{product.high | number : '1.2-2'}}</td>
             <td>{{product.low | number : '1.2-2'}}</td>
             <td>{{product.price | number : '1.2-2'}}</td>
           </tr>
@@ -146,6 +148,8 @@
       <ng-template pTemplate="header">
         <div class="stock-header">
           <h2 class="px-3 pt-3">Stock Table</h2>
+          <i   class="pi pi-download" *ngIf="isSearchStock" style="font-size: 1.5rem;cursor: pointer;margin-left: auto;"
+          (click)="downloadSearchStocks()"></i>
         </div>
       </ng-template>
       <p-table [value]="stockData" [paginator]="stockData.length > 5" [rows]="5"
@@ -153,14 +157,14 @@
         [rowsPerPageOptions]="[5,10, 25, 50]">
         <ng-template pTemplate="header">
           <tr>
-            <th style="width:20%">Date </th>
-            <th style="width:20%">Name </th>
+            <th>Date </th>
+            <th> Name </th> 
           </tr>
         </ng-template>
         <ng-template pTemplate="body" let-product>
           <tr>
             <td>{{product.date | date:'dd-MM-yyyy'}}</td>
-            <td>{{product.name}}</td>
+            <td>{{product.name}}</td> 
           </tr>
         </ng-template>
       </p-table>
