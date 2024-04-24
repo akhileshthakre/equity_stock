@@ -40,6 +40,8 @@
             <ul *ngIf="uploadStocks.length">
               <li *ngFor="let file of uploadStocks">{{ file.name }} - {{ file.size }} bytes</li>
             </ul>
+            <h2 class="success-msg" *ngIf="successMessage">{{successMessage}}</h2>
+            <h2 class="fail-msg" *ngIf="failMessage">{{failMessage}}</h2>
           </ng-template>
         </p-fileUpload>
 
