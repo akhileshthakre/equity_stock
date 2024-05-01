@@ -2,6 +2,7 @@ const db = require('../../model');
 const Stock = db.stocks;
 const TestValue = db.testValues
 const ExecutionFile = db.executionSheet
+const StockSymbols = db.stockSymbols
 
 const convertSheetColumnsToDatabase = (sheetColumns, userId) => {
   const columnMapping = {
@@ -129,6 +130,12 @@ try{
         fields: databaseColumns,
         updateOnDuplicate: databaseColumns, 
       });
+      break;
+    case 'allStockSymbols':
+      await StockSymbols.destroy({
+        where: { userId },
+      });
+      await StockSymbols.bulkCreate(rows, {updateOnDuplicate: Object.keys(rows[0]) });
       break;
    }
    console.log('Bulk insert completed.');

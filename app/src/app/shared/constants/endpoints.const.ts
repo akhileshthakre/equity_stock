@@ -9,6 +9,7 @@ export const END_POINT_CONST = {
         DELETE_TEST_LIST: '/testValue/deleteAllTestValues',
         GET_ALL_TEST_VALUES: '/testValue',
         CALCULATE: '/calculation',
+        SEARCH_STOCK: '/searchStock',
         GET_USER: '/user'
     },
     EXECUTION: {
@@ -16,6 +17,10 @@ export const END_POINT_CONST = {
         UPLOAD_EXECUTION_SHEET: '/upload/executionFile',
         GET_EXECUTION_SHEET: '/executionSheet',
         CALCULATE_EXECUTION: '/execution/calculate'
+    },
+    STOCKS_SYMBOLS: {
+        UPLOAD_STOCK_SYMBOLS: '/upload/allStockSymbols', 
+        GET_STOCK_SYMBOLS: '/searchStock/downloadStocks',         
     }
 
 }

@@ -8,6 +8,11 @@ const calculateValues = require('./_helpers/calculateValues');
 
 const NUM_THREADS = os.cpus().length;
 
+const  roundToDecimalPlaces = (number)  => {
+  let factor = Math.pow(10, 4);
+  return Math.round(number * factor) / factor;
+}
+
 const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPercent, stockId, isNewFormula) => {
   const yearsArray = stocks.map((stock) => {
       const date = new Date(stock.dataValues.period)
@@ -40,7 +45,74 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
         }
         acc[year] += stock.Ret || 0.0;
         return acc;
-      }, {});    
+      }, {})
+      
+      const tradesPerYear = () => {
+        if(numberOfYears === 1)  {
+          return 0
+        }else {
+          return roundToDecimalPlaces(totalDays / (numberOfYears - 1))
+        }
+      }
+
+      const absolutePercentPerYear = () => {
+        if (isNaN(tradesPerYear()) || isNaN(avgGain)) {
+            return 0
+        } else {
+            return roundToDecimalPlaces(tradesPerYear() * avgGain)
+        }
+      }
+
+
+      const annualReturn = () => {
+        if (testValue.dataValues.hldDay === 0 || tradesPerYear() === 0) { 
+            return 0
+        } else {
+            const result = (250 / (testValue.dataValues.hldDay * tradesPerYear())) * absolutePercentPerYear();
+            return isFinite(result) ? roundToDecimalPlaces(result) : 0
+        }
+      }
+
+      const numberOfNegativeYears = () => {
+        try {
+            let count = 0;
+            for (let key in yearlySums) {
+                if (yearlySums[key] < 0) {
+                    count++
+                }
+            }
+            return count;
+        } catch (error) {
+            return 0
+        }
+      }
+
+      const negativePercentage = () => {
+        if (tradesPerYear() === 1) {
+            return 0
+        } else {
+            try {
+                return roundToDecimalPlaces(numberOfNegativeYears() / (numberOfYears - 1))
+            } catch (error) {
+                return 0
+            }
+        }
+    }
+
+    const maxNegativePercentage = () => {
+      try {
+          const values = Object.values(yearlySums)
+          if (values.length === 0 || values.some(value => typeof value !== 'number' || isNaN(value))) {
+              return 0
+          }
+          const maxNegavtivePercent =  Math.min(...values) / 100
+          return roundToDecimalPlaces(maxNegavtivePercent)
+      } catch (error) {
+          return 0
+      }
+  }
+    
+
 
       return {
         nameOfStock: stockId || stocks[0].dataValues.name,
@@ -52,6 +124,12 @@ const fetchDataBatch = async (stocks, testValues, slossPercent, tgPercent, tsPer
         avgGain,
         winPercent,
         numberOfYears,
+        tradesPerYear: tradesPerYear(),
+        absolutePercentPerYear: absolutePercentPerYear(),
+        annualReturn: annualReturn(),
+        numberOfNegativeYears: numberOfNegativeYears(),
+        negativePercentage: negativePercentage(),
+        maxNegativePercentage: maxNegativePercentage(),
         years: uniqueYears,
         yearlyRetSum: yearlySums,
       };
@@ -132,29 +210,16 @@ const CalculationService = {
           avgGain: data.avgGain,
           winPercent: data.winPercent,
           numberOfYears: data.numberOfYears,
+          tradesPerYear: data.tradesPerYear,
+          absolutePercentPerYear: data.absolutePercentPerYear,
+          annualReturn:data.annualReturn,
+          numberOfNegativeYears: data.numberOfNegativeYears,
+          negativePercentage: data.negativePercentage,
+          maxNegativePercentage: data.maxNegativePercentage,
           years: isYearlySumEnabled ? data.years : [],
           yearlyRetSum: isYearlySumEnabled ? data.yearlyRetSum : {},
           userId: userId,
         }));
-      
-        // if(downloadAll) {
-        //   const formattedData = flattenedResults.map(data => ({
-        //     nameOfStock: data.nameOfStock,
-        //     fallInStock: data.fallInStock,
-        //     limitLevel: data.limitLevel,
-        //     hldDay: data.hldDay,
-        //     numberOfUpMoves: data.numberOfUpMoves,
-        //     numberOfDownMoves: data.numberOfDownMoves,
-        //     totalDays: data.totalDays,
-        //     totalRetSum: data.totalRetSum,
-        //     avgGain: data.avgGain,
-        //     winPercent: data.winPercent,
-        //     numberOfYears: data.numberOfYears,
-        //     yearlyRetSum: data.yearlyRetSum,
-        //     userId: userId,
-        //   }));
-        //   await Output.bulkCreate(formattedData, { updateOnDuplicate: Object.keys(formattedData[0]) });
-        // }
       
         results.push(finalOutput);
       }

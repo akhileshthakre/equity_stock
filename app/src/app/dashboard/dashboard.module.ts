@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
+import { CalendarModule } from 'primeng/calendar';
 import { TooltipModule } from 'primeng/tooltip';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { HomeComponent } from './components/home/home.component';
@@ -35,7 +35,7 @@ import { ExecutionComponent } from './components/execution/execution.component';
     InputTextModule,
     SharedModule,
     FormsModule,
-    ProgressSpinnerModule, 
+    ProgressSpinnerModule, CalendarModule
   ],
   providers : [AuthGuardService]
 })
