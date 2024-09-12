@@ -78,7 +78,7 @@
   <p-card class="col-4">
     <div>
       <div class="back-test">
-        <h2 class="pl-2 mb-1" style="flex-grow: 2;">Back Test</h2>
+        <h2 class="pl-2 mb-1" style="flex-grow: 2;">{{ isNewFormula ? 'Strategy 2' : 'Strategy 1' }}</h2>
         <div class="mr-1">
           <label class="switch">
             <input type="checkbox" [(ngModel)]="isNewFormula">
