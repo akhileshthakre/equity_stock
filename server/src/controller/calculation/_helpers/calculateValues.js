@@ -81,14 +81,18 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }else {
       if (open === "") {
         return "";
-      } 
-      if (prevCarry === 1 && low < hrefPoint * (1 + constantB1)){
-        return prevBp;
-      }
-      if (low < hrefPoint * (1 + constantB1 - constantD1)) {
-        return roundToDecimalPlaces(hrefPoint * (1 + constantB1 - constantD1))
       } else {
-        return "";
+        if (prevCarry === 1){
+          return prevBp;
+        }else {
+          const comparisonValue = hrefPoint * (1 + constantB1 - constantD1);
+          if (low < comparisonValue) {
+              const minimum = Math.min(open, comparisonValue);
+              return roundToDecimalPlaces(minimum)
+          } else {
+              return "";
+          }
+        }
       }
     }
 
@@ -241,7 +245,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateSP = (stock, prevStock, index, testValue) => {
+  const calculateSP = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
@@ -253,22 +257,39 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue);
     const price = stock.price;
     const constantW1 = constantTS; // Replace this with W1 from sheet
-  
-    if (open === "") {
-      return "";
-    } else {
-      if (tradeClose === 1) {
-        if (slHit === 1) {
-          return roundToDecimalPlaces(sloss * (1 - constantW1));
-        } else if (tgtHit === 1) {
-          return roundToDecimalPlaces(tgt * (1 - constantW1));
-        } else if (tradeClose === 1) {
-          return roundToDecimalPlaces(price * (1 - constantW1));
+
+    if(!isNewFormula) {
+      if (open === "") {
+        return "";
+      } else {
+        if (tradeClose === 1) {
+          if (slHit === 1) {
+            return roundToDecimalPlaces(sloss * (1 - constantW1));
+          } else if (tgtHit === 1) {
+            return roundToDecimalPlaces(tgt * (1 - constantW1));
+          } else if (tradeClose === 1) {
+            return roundToDecimalPlaces(price * (1 - constantW1));
+          } else {
+            return "";
+          }
         } else {
           return "";
         }
-      } else {
+      }
+    }else {
+      if (open === "") {
         return "";
+      } else {
+          if (tradeClose === 1) {
+              if (slHit === 1) {
+                  return roundToDecimalPlaces(Math.min(open, sloss * (1 - constantW1)))
+              } else if (tgtHit === 1) {
+                  return roundToDecimalPlaces(Math.max(open, tgt * (1 - constantW1)))
+              } else if (tradeClose === 1) {
+                  return roundToDecimalPlaces(price * (1 - constantW1))
+              }
+          }
+          return "";
       }
     }
   };
@@ -372,7 +393,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
       const tgtHit = calculateTGTHit(stock, prevStock, index, testValue);
       const hldDay = calculateHLDDay(stock, prevStock, index, testValue);
       const tradeClose = calculateTradeClose(stock, prevStock, index, testValue);
-      const sp = calculateSP(stock, prevStock, index, testValue);
+      const sp = calculateSP(stock, prevStock, index, testValue, isNewFormula);
       const carry = calculateCarry(stock, prevStock, index, sp, testValue);
       const sloss = calculateSloss(stock, prevStock, index, testValue);
       const ret = calculateRet(stock, prevStock, index, testValue);
