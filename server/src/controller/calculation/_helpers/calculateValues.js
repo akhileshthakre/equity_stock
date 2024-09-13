@@ -3,7 +3,7 @@ let constantTS // change this with W1 from sheet as user input
 let constantSloss // Change with the actual M2 from the sheet as user input
 let constantTGT //change it with the N2 of the sheet as user input
 
-const calculateHRefPoints = (stock, prevStock, index, testValue) => {
+const calculateHRefPoints = (stock, prevStock, index, testValue, isNewFormula) => {
     const fallInStock = testValue.fallInStock
     const high = stock.high;
     if (index === 0) {
@@ -32,7 +32,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
 };
 
   
-  const calculateDeclineFromRP = (stock, prevStock, index, testValue) => {
+  const calculateDeclineFromRP = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0) {
         return null
     }
@@ -62,7 +62,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     const prevCarry = prevStock ? prevStock.Carry : null;
     const prevBp = prevStock ? prevStock.BP : null;
     const low = stock.low;
-    const hrefPoint = stock.HrefPoint ? stock.HrefPoint : calculateHRefPoints(stock, prevStock, index, testValue);
+    const hrefPoint = stock.HrefPoint ? stock.HrefPoint : calculateHRefPoints(stock, prevStock, index, testValue, isNewFormula);
     const constantB1 = fallInStock / 100; // change it with B1 of the sheet
     const constantD1 = limitLevel / 100; // change it with D1 of the sheet
   
@@ -99,11 +99,11 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
   };
   
   
-  const calculatePosInitial = (stock, prevStock, index, testValue) => { 
+  const calculatePosInitial = (stock, prevStock, index, testValue, isNewFormula) => { 
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
-    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
+    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue, isNewFormula);
     const prevBp = prevStock ? prevStock.BP : null;
 
     if (bp === "") {
@@ -113,14 +113,14 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateTGT = (stock, prevStock, index, testValue) => {
+  const calculateTGT = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.DPosInitial? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const prevCarry = prevStock ? prevStock.Carry : null;
-    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
+    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue, isNewFormula);
     const constantN2 = constantTGT; //change it with the N2 of the sheet
   
     if (open === "") {
@@ -134,15 +134,15 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateSLHit = (stock, prevStock, index, testValue) => {
+  const calculateSLHit = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const low = stock.low;
-    const sloss = stock.Sloss ? stock.Sloss : calculateSloss(stock, prevStock, index, testValue);
+    const sloss = stock.Sloss ? stock.Sloss : calculateSloss(stock, prevStock, index, testValue, isNewFormula);
   
     if (open === "") {
       return "";
@@ -155,15 +155,15 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateTGTHit = (stock, prevStock, index, testValue) => {
+  const calculateTGTHit = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
-    const slHit = stock.SLHit ? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue);
+    const slHit = stock.SLHit ? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue, isNewFormula);
     const high = stock.high;
-    const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue);
-    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue, isNewFormula);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const prevCarry = prevStock ? prevStock.Carry : null;
   
     if (open === "") {
@@ -177,12 +177,12 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateHLDDay = (stock, prevStock, index, testValue) => {
+  const calculateHLDDay = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const prevHldDays = prevStock ? prevStock.HLDDay : null;;
 
@@ -199,50 +199,79 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateTradeClose = (stock, prevStock, index, testValue) => {
+  const calculateTradeClose = (stock, prevStock, index, testValue, isNewFormula) => {
     const holdingDay = testValue.hldDay
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
-    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const prevCarry = prevStock ? prevStock.Carry : null
-    const slHit = stock.SLHit? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue);
-    const tgtHit = stock.TGTHit ? stock.TGTHit : calculateTGTHit(stock, prevStock, index, testValue);
-    const hldDay = stock.HLDDay ? stock.HLDDay : calculateHLDDay(stock, prevStock, index, testValue);
+    const slHit = stock.SLHit? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue, isNewFormula);
+    const tgtHit = stock.TGTHit ? stock.TGTHit : calculateTGTHit(stock, prevStock, index, testValue, isNewFormula);
+    const hldDay = stock.HLDDay ? stock.HLDDay : calculateHLDDay(stock, prevStock, index, testValue, isNewFormula);
     const constantF1 = holdingDay; // Change it with cell F1 of the sheet
-  
-    if (open === "") {
-      return "";
-    } else {
-      if ((posInitial === 1 || prevCarry === 1) && (slHit === 1 || tgtHit === 1 || hldDay === constantF1) ) {
-        // console.log('..................', hldDay, prevCarry, posInitial, slHit, tgtHit)
-        return 1;
+    if(!isNewFormula){
+      if (open === "") {
+        return "";
       } else {
-        return 0;
+        if ((posInitial === 1 || prevCarry === 1) && (slHit === 1 || tgtHit === 1 || hldDay === constantF1) ) {
+          return 1;
+        } else {
+          return 0;
+        }
       }
-    }
+      }else {
+        if (open === "") {
+          return "";
+        } else {
+            if ((posInitial === 1 || prevCarry === 1) && (slHit === 1 || tgtHit === 1)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+      }
   };
   
-  const calculateSloss = (stock, prevStock, index, testValue) => {
+  const calculateSloss = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
+    const holdingDay = testValue.hldDay
     const open = stock.open;
+    const prevLow = prevStock.low
     const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index,testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
-    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
+    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue, isNewFormula)
+    const hldDay = stock.HLDDay ? stock.HLDDay : calculateHLDDay(stock, prevStock, index, testValue, isNewFormula);
     const constantM2 = constantSloss; //Change with the actual M2 from the sheet
-  
-    if (open === "") {
-      return "";
-    } else {
-      if (posInitial === 1 || prevCarry === 1) {
-        return roundToDecimalPlaces(bp * (1 - constantM2));
-      } else {
+    const constantF1 = holdingDay;
+    if(!isNewFormula) {
+      if (open === "") {
         return "";
+      } else {
+        if (posInitial === 1 || prevCarry === 1) {
+          return roundToDecimalPlaces(bp * (1 - constantM2));
+        } else {
+          return "";
+        }
+      }
+    }else {
+      if (open === "") {
+        return "";
+      } else {
+          if (posInitial === 1 || prevCarry === 1) {
+              if (hldDay > constantF1) {
+                  return prevLow;
+              } else {
+                  return roundToDecimalPlaces(bp * (1 - constantM2));
+              }
+          }
+          return "";
       }
     }
+
   };
   
   const calculateSP = (stock, prevStock, index, testValue, isNewFormula) => {
@@ -250,11 +279,11 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
         return null
     }
     const open = stock.open;
-    const tradeClose = stock.TradeClose ? stock.TradeClose : calculateTradeClose(stock, prevStock, index, testValue);
-    const slHit = stock.SLHit? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue);
-    const tgtHit = stock.TGTHit ? stock.TGTHit : calculateTGTHit(stock, prevStock, index, testValue);
-    const sloss = stock.Sloss ? stock.Sloss : calculateSloss(stock, prevStock, index, testValue);
-    const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue);
+    const tradeClose = stock.TradeClose ? stock.TradeClose : calculateTradeClose(stock, prevStock, index, testValue, isNewFormula);
+    const slHit = stock.SLHit? stock.SLHit : calculateSLHit(stock, prevStock, index, testValue, isNewFormula);
+    const tgtHit = stock.TGTHit ? stock.TGTHit : calculateTGTHit(stock, prevStock, index, testValue, isNewFormula);
+    const sloss = stock.Sloss ? stock.Sloss : calculateSloss(stock, prevStock, index, testValue, isNewFormula);
+    const tgt = stock.TGT ? stock.TGT : calculateTGT(stock, prevStock, index, testValue,isNewFormula);
     const price = stock.price;
     const constantW1 = constantTS; // Replace this with W1 from sheet
 
@@ -276,6 +305,19 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
           return "";
         }
       }
+    }else if(index === 3 ){
+      if (open === "") {
+        return "";
+      } else {
+          if (tradeClose === 1) {
+              if (slHit === 1) {
+                  return roundToDecimalPlaces(Math.min(open, sloss * (1 - constantW1)))
+              } else if (tgtHit === 1) {
+                  return roundToDecimalPlaces(Math.max(open, tgt * (1 - constantW1)))
+              } 
+          }
+          return "";
+      }
     }else {
       if (open === "") {
         return "";
@@ -294,13 +336,13 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateCarry = (stock, prevStock, index, spValue, testValue) => {
+  const calculateCarry = (stock, prevStock, index, spValue, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
     const open = stock.open;
     const prevCarry = prevStock ? prevStock.Carry : null;
-    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue);
+    const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
     const sp = spValue;
   
     if (open === "") {
@@ -314,12 +356,12 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     }
   };
   
-  const calculateRet = (stock, prevStock, index, testValue) => {
+  const calculateRet = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
         return null
     }
-    const sp = stock.SP? stock.SP : calculateSP(stock, prevStock, index, testValue);
-    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue);
+    const sp = stock.SP? stock.SP : calculateSP(stock, prevStock, index, testValue, isNewFormula);
+    const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue, isNewFormula);
     if(sp === "" || sp === null) {
         return null
     }
@@ -328,13 +370,13 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     return roundToDecimalPlaces(test/10);
   };
 
-  const calculateND = (stock, prevStock, index, testValue) => {
+  const calculateND = (stock, prevStock, index, testValue, isNewFormula) => {
     if(index === 0 || index === 1 || index === 2 ) {
       return null
     }
-    const tradeClose = stock.TradeClose ? stock.TradeClose : calculateTradeClose(stock, prevStock, index, testValue);
-    const sp = stock.SP? stock.SP : calculateSP(stock, prevStock, index, testValue);
-    const hrefPoint = stock.HrefPoint ? stock.HrefPoint : calculateHRefPoints(stock, prevStock, index, testValue);
+    const tradeClose = stock.TradeClose ? stock.TradeClose : calculateTradeClose(stock, prevStock, index, testValue, isNewFormula);
+    const sp = stock.SP? stock.SP : calculateSP(stock, prevStock, index, testValue, isNewFormula);
+    const hrefPoint = stock.HrefPoint ? stock.HrefPoint : calculateHRefPoints(stock, prevStock, index, testValue, isNewFormula);
     const high = stock.high
 
     if (tradeClose === 1) {
@@ -384,20 +426,20 @@ const calculateHRefPoints = (stock, prevStock, index, testValue) => {
     let prevStock = null;
     const calculatedStocks = stocks.map( (stockData, index) => {
       const stock = stockData.dataValues
-      const hrefPoint = calculateHRefPoints(stock, prevStock, index, testValue);
-      const declineInRP = calculateDeclineFromRP(stock, prevStock, index, testValue);
+      const hrefPoint = calculateHRefPoints(stock, prevStock, index, testValue, isNewFormula);
+      const declineInRP = calculateDeclineFromRP(stock, prevStock, index, testValue, isNewFormula);
       const bp = calculateBP(stock, prevStock, index, testValue, isNewFormula);
-      const posInitial = calculatePosInitial(stock, prevStock, index, testValue);
-      const tgt = calculateTGT(stock, prevStock, index, testValue);
-      const slHit = calculateSLHit(stock, prevStock, index, testValue);
-      const tgtHit = calculateTGTHit(stock, prevStock, index, testValue);
-      const hldDay = calculateHLDDay(stock, prevStock, index, testValue);
-      const tradeClose = calculateTradeClose(stock, prevStock, index, testValue);
+      const posInitial = calculatePosInitial(stock, prevStock, index, testValue, isNewFormula);
+      const tgt = calculateTGT(stock, prevStock, index, testValue, isNewFormula);
+      const slHit = calculateSLHit(stock, prevStock, index, testValue, isNewFormula);
+      const tgtHit = calculateTGTHit(stock, prevStock, index, testValue, isNewFormula);
+      const hldDay = calculateHLDDay(stock, prevStock, index, testValue, isNewFormula);
+      const tradeClose = calculateTradeClose(stock, prevStock, index, testValue, isNewFormula);
       const sp = calculateSP(stock, prevStock, index, testValue, isNewFormula);
-      const carry = calculateCarry(stock, prevStock, index, sp, testValue);
-      const sloss = calculateSloss(stock, prevStock, index, testValue);
-      const ret = calculateRet(stock, prevStock, index, testValue);
-      const nd = calculateND(stock, prevStock, index, testValue);
+      const carry = calculateCarry(stock, prevStock, index, sp, testValue, isNewFormula);
+      const sloss = calculateSloss(stock, prevStock, index, testValue, isNewFormula);
+      const ret = calculateRet(stock, prevStock, index, testValue, isNewFormula);
+      const nd = calculateND(stock, prevStock, index, testValue, isNewFormula);
       const lp = calculateLP(stock, prevStock, index, testValue, nd, carry);
 
       prevStock = {
