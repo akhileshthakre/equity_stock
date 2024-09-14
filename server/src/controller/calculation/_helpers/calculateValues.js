@@ -305,19 +305,6 @@ const calculateHRefPoints = (stock, prevStock, index, testValue, isNewFormula) =
           return "";
         }
       }
-    }else if(index === 3 ){
-      if (open === "") {
-        return "";
-      } else {
-          if (tradeClose === 1) {
-              if (slHit === 1) {
-                  return roundToDecimalPlaces(Math.min(open, sloss * (1 - constantW1)))
-              } else if (tgtHit === 1) {
-                  return roundToDecimalPlaces(Math.max(open, tgt * (1 - constantW1)))
-              } 
-          }
-          return "";
-      }
     }else {
       if (open === "") {
         return "";
