@@ -240,7 +240,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue, isNewFormula) =
     }
     const holdingDay = testValue.hldDay
     const open = stock.open;
-    const prevLow = prevStock.low
+    const prevPrice = prevStock.price
     const posInitial = stock.DPosInitial ? stock.DPosInitial : calculatePosInitial(stock, prevStock, index,testValue);
     const prevCarry = prevStock ? prevStock.Carry : null;
     const bp = stock.BP ? stock.BP : calculateBP(stock, prevStock, index, testValue, isNewFormula)
@@ -263,7 +263,7 @@ const calculateHRefPoints = (stock, prevStock, index, testValue, isNewFormula) =
       } else {
           if (posInitial === 1 || prevCarry === 1) {
               if (hldDay > constantF1) {
-                  return prevLow;
+                  return prevPrice;
               } else {
                   return roundToDecimalPlaces(bp * (1 - constantM2));
               }
