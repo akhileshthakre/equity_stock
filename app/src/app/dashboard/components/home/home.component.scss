@@ -125,3 +125,24 @@ input:checked+.slider:before {
   display: flex;
   justify-content: center;
 }
+
+
+.bt-form-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem; /* Space between form elements */
+}
+
+.bt-form-field {
+  flex: 1 1 45%; /* Each field takes 45% of the width in a row */
+  display: flex;
+  flex-direction: column; /* Stack label and input vertically */
+}
+
+.bt-form-label {
+  margin-bottom: 0.5rem; /* Gap between label and input */
+}
+
+.bt-form-input {
+  /* Additional styles for inputs can go here */
+}

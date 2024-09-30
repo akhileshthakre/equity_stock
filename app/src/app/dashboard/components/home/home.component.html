@@ -80,31 +80,67 @@
       <div class="back-test">
         <h2 class="pl-2 mb-1" style="flex-grow: 2;">{{ isNewFormula ? 'Strategy 2' : 'Strategy 1' }}</h2>
         <div class="mr-1">
+          <div class="form-input bt-form-field">
+            <div style="margin-bottom: 10px;">Add Filters</div>
+
           <label class="switch">
-            <input type="checkbox" [(ngModel)]="isNewFormula">
+            <input type="checkbox" [(ngModel)]="showFilters">
             <span class="slider round"></span>
-            <div>Use BP Variation</div>
+           
           </label>
+          </div>
         </div>
-        <p-button class="pt-1" label="Start Back Test"
-          [disabled]="!testList.length && (!products.length || !stockData.length)"
-          (click)="startBackTest(1)"></p-button>
+       
+
+
       </div>
 
-      <form class="backTestForm" [formGroup]="backTestForm" class=" flex gap-1 pt-5">
-        <div class="form-input">
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="SLOSS %" class="p-inputtext-sm"
-            formControlName="slossPercent" />
+     
+      <!-- <p-button class="pt-1 mt-3" label="{{ showFilters ? 'Remove Filter' : 'Add Filter' }}" (click)="toggleFilters()"></p-button> -->
+
+      <form *ngIf="showFilters" class="backTestForm bt-form-container" [formGroup]="backTestForm">
+        <div class="form-input bt-form-field">
+          <label class="bt-form-label">Total Sum</label>
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Total Sum" class="bt-form-input p-inputtext-sm" formControlName="totalSum" />
         </div>
-        <div class="form-input">
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TGT %" class="p-inputtext-sm"
-            formControlName="tgPercent" />
+      
+        <div class="form-input bt-form-field">
+          <label class="bt-form-label">Average Gain</label>
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Average Gain" class="bt-form-input p-inputtext-sm" formControlName="avgGain" />
         </div>
-        <div class="form-input">
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="TSC %" class="p-inputtext-sm"
-            formControlName="tsPercent" />
+      
+        <div class="form-input bt-form-field">
+          <label class="bt-form-label">Win %</label>
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Win %" class="bt-form-input p-inputtext-sm" formControlName="winPercent" />
         </div>
+      
+        <div class="form-input bt-form-field">
+          <label class="bt-form-label">No. of Negative Years</label>
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="No. of Negative Years" class="bt-form-input p-inputtext-sm" formControlName="numNegativeYears" />
+        </div>
+      
+        <div class="form-input bt-form-field" style="max-width: 50%;">
+          <label class="bt-form-label">Max Negative %</label>
+          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Max Negative %" class="bt-form-input p-inputtext-sm" formControlName="maxNegativePercentage" />
+        </div>
+
+        
+
       </form>
+      <div style="margin-top: 20px;display: flex;flex-flow: row wrap;justify-content: end;align-items: center;">
+      <div class="mr-1" style="display: flex;align-items: center;">
+        <div style="padding-right: 10px;display: inline-block;">Use BP Variation</div>
+        <label  class="switch">
+          <input type="checkbox" [(ngModel)]="isNewFormula">
+          <span class="slider round"></span>
+         
+        </label>
+      </div>
+      <p-button class="pt-1 pl-5" label="Start Back Test"
+        [disabled]="!testList.length && (!products.length || !stockData.length)"
+        (click)="startBackTest(1)"></p-button>
+      
+      </div>
     </div>
   </p-card>
 </div>
@@ -229,6 +265,8 @@
           <th>TotalSum </th>
           <th>AvgGain </th>
           <th>Win% </th>
+          <th>No. of. Negative years </th>
+          <th>Max Negative percentage</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-product>
@@ -241,6 +279,8 @@
           <td>{{product.totalRetSum}}</td>
           <td>{{product.avgGain}}</td>
           <td>{{product.winPercent}}</td>
+          <td>{{product.numberOfNegativeYears}}</td>
+          <td>{{product.maxNegativePercentage}}</td>
         </tr>
       </ng-template>
 

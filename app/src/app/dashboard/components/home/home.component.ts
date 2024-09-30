@@ -47,15 +47,28 @@ export class HomeComponent implements OnInit {
     outputData: any[] = []
     maxDate: Date = new Date()
     backTestForm: FormGroup = this.formBuilder.group({
-        slossPercent: [],
-        tgPercent: [],
-        tsPercent: [],
+        // slossPercent: [],
+        // tgPercent: [],
+        // tsPercent: [],
+      
+        totalSum: ['', Validators.required],
+        avgGain: ['', Validators.required],
+        winPercent: ['', Validators.required],
+        numNegativeYears: ['', Validators.required],
+        maxNegativePercentage: ['', Validators.required],
+       
+        
     })
     stockSearchForm: FormGroup = this.formBuilder.group({
         searchStocks: ['', Validators.required],
         dateRange: ['', Validators.required]
     })
     isSearchStock: boolean = false;
+    showFilters: boolean = false;  // Controls the visibility of the filter form
+
+    toggleFilters() {
+        this.showFilters = !this.showFilters;  // Toggle the visibility of the filters
+    }
 
     constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
 
@@ -75,6 +88,29 @@ export class HomeComponent implements OnInit {
     get tsPercentControl() {
         return this.backTestForm.get('tsPercent')
     }
+
+    get totalSumControl() {
+        return this.backTestForm.get('totalSum')
+    }
+
+    get avgGainControl() {
+        return this.backTestForm.get('avgGain')
+    }
+
+    get winPercentControl() {
+        return this.backTestForm.get('winPercent')
+    }
+
+    get numNegativeYearsControl() {
+        return this.backTestForm.get('numNegativeYears')
+    }
+
+    get maxNegativePercentageControl() {
+        return this.backTestForm.get('maxNegativePercentage')
+    }
+
+
+
     getDateRange(event: any, calendar: any) {
         calendar.overlayVisible = false;
         console.log(this.dateRange)
@@ -326,6 +362,12 @@ export class HomeComponent implements OnInit {
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
         if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value
+        if (this.totalSumControl?.value) obj['totalSum'] = this.totalSumControl?.value
+        if (this.avgGainControl?.value) obj['avgGain'] = this.avgGainControl?.value
+        if (this.winPercentControl?.value) obj['winPercent'] = this.winPercentControl?.value
+        if (this.numNegativeYearsControl?.value) obj['numNegativeYears'] = this.numNegativeYearsControl?.value
+        if (this.maxNegativePercentageControl?.value) obj['maxNegativePercentage'] = this.maxNegativePercentageControl?.value
+
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
@@ -374,6 +416,12 @@ export class HomeComponent implements OnInit {
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
         if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value
+        if (this.totalSumControl?.value) obj['totalSum'] = this.totalSumControl?.value
+        if (this.avgGainControl?.value) obj['avgGain'] = this.avgGainControl?.value
+        if (this.winPercentControl?.value) obj['winPercent'] = this.winPercentControl?.value
+        if (this.numNegativeYearsControl?.value) obj['numNegativeYears'] = this.numNegativeYearsControl?.value
+        if (this.maxNegativePercentageControl?.value) obj['maxNegativePercentage'] = this.maxNegativePercentageControl?.value
+
         this.calOutPut(obj, type)
     }
 
@@ -388,6 +436,12 @@ export class HomeComponent implements OnInit {
         if (this.slossPercentControl?.value) obj['slossPercent'] = this.slossPercentControl?.value
         if (this.tgPercentControl?.value) obj['tgPercent'] = this.tgPercentControl?.value
         if (this.tsPercentControl?.value) obj['tsPercent'] = this.tsPercentControl?.value
+        if (this.totalSumControl?.value) obj['totalSum'] = this.totalSumControl?.value
+        if (this.avgGainControl?.value) obj['avgGain'] = this.avgGainControl?.value
+        if (this.winPercentControl?.value) obj['winPercent'] = this.winPercentControl?.value
+        if (this.numNegativeYearsControl?.value) obj['numNegativeYears'] = this.numNegativeYearsControl?.value
+        if (this.maxNegativePercentageControl?.value) obj['maxNegativePercentage'] = this.maxNegativePercentageControl?.value
+
         this.calOutPut(obj)
     }
 
@@ -397,7 +451,7 @@ export class HomeComponent implements OnInit {
         this.spinnerService.showSpinner(true)
         this._stockService.calculateOutPut(obj).subscribe((resp: any) => {
             this.spinnerService.showSpinner(false)
-            this.backTestForm.reset()
+            //this.backTestForm.reset()
             if (!this.isSearchStock) {
                 if (resp) {
                     if (this.fileCount < 2) {
@@ -424,6 +478,8 @@ export class HomeComponent implements OnInit {
                                     item.avgGain = Number(item.avgGain);
                                     item.winPercent = Number(item.winPercent);
                                     item.numberOfYears = Number(item.numberOfYears)
+                                    item.numberOfNegativeYears = Number(item.numberOfNegativeYears)
+                                    item.maxNegativePercentage = Number(item.maxNegativePercentage);
 
                                 });
                                 let data = {
@@ -445,8 +501,8 @@ export class HomeComponent implements OnInit {
                             this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
                         } else {
                             this.formatOPList()
-                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
-                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years', 'No of Negative Years', 'Max Negative %']
+                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears', 'numberOfNegativeYears', 'maxNegativePercentage']
                             this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
                         }
                     }
@@ -499,8 +555,8 @@ export class HomeComponent implements OnInit {
                             this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
                         } else {
                             this.formatOPList()
-                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years']
-                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears']
+                            this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years', 'No of Negative Years', 'Max Negative %'], 
+                            this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears', 'numberOfNegativeYears', 'maxNegativePercentage']
                             this.exportToExcl(type, this.outputList[0].nameOfStock + '_OutPut.xlsx', this.outputList, this.opHeaders, this.opHeadersMapping)
                         }
                     }
@@ -579,6 +635,8 @@ export class HomeComponent implements OnInit {
             item.avgGain = this.formatPercentage(Number(item.avgGain * 100));
             item.winPercent = this.formatPercentage(Number(item.winPercent * 100));
             item.numberOfYears = Number(item.numberOfYears)
+            item.numberOfNegativeYears = Number(item.numberOfNegativeYears)
+            item.maxNegativePercentage = this.formatPercentage(Number(item.maxNegativePercentage * 100));
 
         });
     }
