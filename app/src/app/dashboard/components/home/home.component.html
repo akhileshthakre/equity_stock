@@ -100,27 +100,27 @@
 
       <form *ngIf="showFilters" class="backTestForm bt-form-container" [formGroup]="backTestForm">
         <div class="form-input bt-form-field">
-          <label class="bt-form-label">Total Sum</label>
+          <label class="bt-form-label">Total Sum (>=)</label>
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Total Sum" class="bt-form-input p-inputtext-sm" formControlName="totalSum" />
         </div>
       
         <div class="form-input bt-form-field">
-          <label class="bt-form-label">Average Gain</label>
+          <label class="bt-form-label">Average Gain (>=)</label>
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Average Gain" class="bt-form-input p-inputtext-sm" formControlName="avgGain" />
         </div>
       
         <div class="form-input bt-form-field">
-          <label class="bt-form-label">Win %</label>
+          <label class="bt-form-label">Win % (>=)</label>
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Win %" class="bt-form-input p-inputtext-sm" formControlName="winPercent" />
         </div>
       
         <div class="form-input bt-form-field">
-          <label class="bt-form-label">No. of Negative Years</label>
+          <label class="bt-form-label">No. of Negative Years (<=)</label>
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="No. of Negative Years" class="bt-form-input p-inputtext-sm" formControlName="numNegativeYears" />
         </div>
       
         <div class="form-input bt-form-field" style="max-width: 50%;">
-          <label class="bt-form-label">Max Negative %</label>
+          <label class="bt-form-label">Max Negative % (>=)</label>
           <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Max Negative %" class="bt-form-input p-inputtext-sm" formControlName="maxNegativePercentage" />
         </div>
 
@@ -237,7 +237,7 @@
   </div>
 </div>
 <!-- showOutPutTable &&  -->
-<div class="out-put main" *ngIf="outputList.length">
+<div class="out-put main modified" *ngIf="outputList.length">
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">
@@ -293,7 +293,7 @@
     </div>
   </p-card>
 </div>
-<div class="out-put main" style="max-width: 60%;" *ngIf="outputData.length">
+<div class="out-put main unmodified" style="max-width: 60%;" *ngIf="outputData.length">
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">

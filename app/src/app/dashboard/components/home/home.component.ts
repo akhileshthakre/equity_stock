@@ -264,7 +264,7 @@ export class HomeComponent implements OnInit {
             const mappedItem: any = {};
             mappingHeaders.forEach((fieldMap, index) => {
                 let value = item[fieldMap];
-                if (value) {
+                if (value !== null && value !== undefined) {
                     mappedItem[headers[index]] = value;
                 } else {
                     mappedItem[headers[index]] = null;
@@ -272,6 +272,8 @@ export class HomeComponent implements OnInit {
             });
             return mappedItem;
         });
+
+        console.log("mappedData", mappedData)
 
         let percentageColumns: number[] = []
         const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(mappedData);
@@ -283,13 +285,15 @@ export class HomeComponent implements OnInit {
             }
             percentageColumns = [1, 2, 5, 6, 7, 10, 11, 13, 14, ...yearlyIndex];
         } else {
-            for (let i = 9; i <= headers.length; i++) {
+            console.log("headers", headers.length)
+            for (let i = 10; i <= headers.length; i++) {
+                
                 yearlyIndex.push(i)
             }
             percentageColumns = [1, 2, 5, 6, 7, ...yearlyIndex];
         }
 
-
+        console.log("percentageColumns", percentageColumns)
 
         percentageColumns.forEach(columnIndex => {
             const range = XLSX.utils.decode_range(worksheet['!ref']!);
@@ -492,14 +496,17 @@ export class HomeComponent implements OnInit {
                         }, 0);
                     }
 
-
+                    console.log("this.poutputList", this.outputList)
+                   
                     if (type == 3) {
                         if (this.isYearlySumEnabled) {
                             this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years', '# Trades / Yr', 'Absolute % / Year', 'Annualized Return %', '# Negative Years', '% Negative Years', 'Max Negative %']
                             this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears', 'tradesPerYear', 'absolutePercentPerYear', 'annualReturn', 'numberOfNegativeYears', 'negativePercentage', 'maxNegativePercentage']
                             let list: any[] = this.formatOPListForYearWise(this.outputList)
+                            console.log("this.outputData", list)
                             this.exportToExcl(type, list[0].nameOfStock + '_Output.xlsx', list, this.opHeaders, this.opHeadersMapping)
                         } else {
+                            console.log("coming to else",  this.outputList)
                             this.formatOPList()
                             this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years', 'No of Negative Years', 'Max Negative %']
                             this.opHeadersMapping = ['nameOfStock', 'fallInStock', 'limitLevel', 'hldDay', 'totalDays', 'totalRetSum', 'avgGain', 'winPercent', 'numberOfYears', 'numberOfNegativeYears', 'maxNegativePercentage']
@@ -547,6 +554,7 @@ export class HomeComponent implements OnInit {
                     }, 0);
                 } else {
                     this.outputList = [].concat(...resp.data)
+                    console.log("this.poutputList", this.outputList)
                     if (type == 3) {
                         if (this.isYearlySumEnabled) {
                             this.opHeaders = ['Stock name', 'Fall in stock', 'Limit level', 'Holding Day', 'Total Trades', 'Total Sum', 'Avg Gain', 'Win %', '# of years', '# Trades / Yr', 'Absolute % / Year', 'Annualized Return %', '# Negative Years', '% Negative Years', 'Max Negative %']
@@ -582,6 +590,9 @@ export class HomeComponent implements OnInit {
             item.avgGain = Number(item.avgGain);
             item.winPercent = Number(item.winPercent);
             item.numberOfYears = Number(item.numberOfYears)
+            item.numberOfNegativeYears = Number(item.numberOfNegativeYears)
+            item.maxNegativePercentage = Number(item.maxNegativePercentage);
+
         });
     }
     formatOPListForYearWise(out_put_list: any[]): any[] {

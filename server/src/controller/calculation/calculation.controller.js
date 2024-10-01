@@ -224,7 +224,7 @@ const CalculationService = {
         const finalOutput = flattenedResults
         .filter((data) =>
           filterConditions.every((condition) =>
-            Object.entries(condition).every(([key, val]) => val[Op.gte] ? data[key] >= val[Op.gte] : data[key] <= val[Op.lt])
+            Object.entries(condition).every(([key, val]) => val[Op.gte] ? data[key] >= val[Op.gte] : data[key] <= val[Op.lte])
           )
         )
         .map((data) => ({
