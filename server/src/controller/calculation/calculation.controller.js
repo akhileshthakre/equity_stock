@@ -5,6 +5,8 @@ const Stock = db.stocks;
 const TestValue = db.testValues;
 const Output = db.outputSheet;
 const calculateValues = require('./_helpers/calculateValues');
+const { Op } = require('sequelize');
+
 
 const NUM_THREADS = os.cpus().length;
 
@@ -145,7 +147,7 @@ const CalculationService = {
     await Output.destroy({
       where: { userId },
     });
-    const { page = 1, pageSize = 100, downloadAll = false, slossPercent, tgPercent, tsPercent, stockId, isNewFormula = false, isYearlySumEnabled = false  } = req.body;
+    const { page = 1, pageSize = 100, downloadAll = false, slossPercent, tgPercent, tsPercent, avgGain, maxNegativePercentage, numNegativeYears,totalSum,winPercent,  stockId, isNewFormula = false, isYearlySumEnabled = false  } = req.body;
     let stocks, testValues, filteredTestValues, results;
 
     try {
@@ -166,6 +168,26 @@ const CalculationService = {
         stocks = await Stock.findAll({where: {userId}});
       }
       const whereClause = stockId ? { name: stockId , userId: userId}: {userId: userId}
+
+      const filterConditions = [];
+
+      if (totalSum) {
+        filterConditions.push({ totalRetSum: { [Op.gte]: Number(totalSum)/100 } });
+      }
+      if (avgGain) {
+        filterConditions.push({ avgGain: { [Op.gte]: Number(avgGain)/100 } });
+      }
+      if (winPercent) {
+        filterConditions.push({ winPercent: { [Op.gte]: Number(winPercent)/100 } });
+      }
+      if (numNegativeYears) {
+        filterConditions.push({ numberOfNegativeYears: { [Op.lte]: Number(numNegativeYears) } });
+      }
+      if (maxNegativePercentage) {
+        filterConditions.push({ maxNegativePercentage: { [Op.gte]: Number(maxNegativePercentage)/100 } });
+      }
+
+
       const uniqueStocks = await Stock.findAll({
         where: {...whereClause},
         attributes: ['name'],
@@ -197,8 +219,15 @@ const CalculationService = {
 
         const stockResults = await Promise.all(workerPromises);
         const flattenedResults = stockResults.flat();
+        console.log('filterConditions', filterConditions)
 
-        const finalOutput = flattenedResults.map(data => ({
+        const finalOutput = flattenedResults
+        .filter((data) =>
+          filterConditions.every((condition) =>
+            Object.entries(condition).every(([key, val]) => val[Op.gte] ? data[key] >= val[Op.gte] : data[key] <= val[Op.lte])
+          )
+        )
+        .map((data) => ({
           nameOfStock: data.nameOfStock,
           fallInStock: data.fallInStock,
           limitLevel: data.limitLevel,
@@ -212,7 +241,7 @@ const CalculationService = {
           numberOfYears: data.numberOfYears,
           tradesPerYear: data.tradesPerYear,
           absolutePercentPerYear: data.absolutePercentPerYear,
-          annualReturn:data.annualReturn,
+          annualReturn: data.annualReturn,
           numberOfNegativeYears: data.numberOfNegativeYears,
           negativePercentage: data.negativePercentage,
           maxNegativePercentage: data.maxNegativePercentage,
