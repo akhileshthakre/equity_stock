@@ -139,6 +139,10 @@
       <p-button class="pt-1 pl-5" label="Start Back Test"
         [disabled]="!testList.length && (!products.length || !stockData.length)"
         (click)="startBackTest(1)"></p-button>
+
+        <p-button class="pt-1 pl-1" label="Backtest and Export"
+        [disabled]="!testList.length && (!products.length || !stockData.length)"
+        (click)="downloadInExcl()"></p-button>
       
       </div>
     </div>
