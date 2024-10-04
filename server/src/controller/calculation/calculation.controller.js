@@ -224,7 +224,21 @@ const CalculationService = {
         const finalOutput = flattenedResults
         .filter((data) =>
           filterConditions.every((condition) =>
-            Object.entries(condition).every(([key, val]) => val[Op.gte] ? data[key] >= val[Op.gte] : data[key] <= val[Op.lte])
+            Object.entries(condition).every(([key, val]) => {
+              // Check for Op.gte and Op.lte explicitly and ensure both conditions are properly checked
+              if (val[Op.gte] !== undefined && val[Op.lte] !== undefined) {
+                // Handle both gte and lte
+                return data[key] >= val[Op.gte] && data[key] <= val[Op.lte];
+              } else if (val[Op.gte] !== undefined) {
+                // Handle only gte
+                return data[key] >= val[Op.gte];
+              } else if (val[Op.lte] !== undefined) {
+                // Handle only lte
+                return data[key] <= val[Op.lte];
+              } else {
+                return true; // Default condition if none exist
+              }
+            })
           )
         )
         .map((data) => ({

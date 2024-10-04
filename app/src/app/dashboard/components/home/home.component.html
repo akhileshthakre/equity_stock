@@ -101,27 +101,27 @@
       <form *ngIf="showFilters" class="backTestForm bt-form-container" [formGroup]="backTestForm">
         <div class="form-input bt-form-field">
           <label class="bt-form-label">Total Sum (>=)</label>
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Total Sum" class="bt-form-input p-inputtext-sm" formControlName="totalSum" />
+          <input type="text" appTwoDigitDecimalWithNegative pInputText maxlength="10" placeholder="Total Sum" class="bt-form-input p-inputtext-sm" formControlName="totalSum" />
         </div>
       
         <div class="form-input bt-form-field">
           <label class="bt-form-label">Average Gain (>=)</label>
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Average Gain" class="bt-form-input p-inputtext-sm" formControlName="avgGain" />
+          <input type="text" pInputText appTwoDigitDecimalWithNegative maxlength="10" placeholder="Average Gain" class="bt-form-input p-inputtext-sm" formControlName="avgGain" />
         </div>
       
         <div class="form-input bt-form-field">
           <label class="bt-form-label">Win % (>=)</label>
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Win %" class="bt-form-input p-inputtext-sm" formControlName="winPercent" />
+          <input type="text" pInputText appTwoDigitDecimalWithNegative maxlength="10" placeholder="Win %" class="bt-form-input p-inputtext-sm" formControlName="winPercent" />
         </div>
       
         <div class="form-input bt-form-field">
           <label class="bt-form-label">No. of Negative Years (<=)</label>
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="No. of Negative Years" class="bt-form-input p-inputtext-sm" formControlName="numNegativeYears" />
+          <input type="text" pInputText appTwoDigitDecimalWithNegative maxlength="10" placeholder="No. of Negative Years" class="bt-form-input p-inputtext-sm" formControlName="numNegativeYears" />
         </div>
       
         <div class="form-input bt-form-field" style="max-width: 50%;">
           <label class="bt-form-label">Max Negative % (>=)</label>
-          <input type="text" pInputText appTwoDigitDecimal maxlength="5" placeholder="Max Negative %" class="bt-form-input p-inputtext-sm" formControlName="maxNegativePercentage" />
+          <input type="text" pInputText appTwoDigitDecimalWithNegative maxlength="10" placeholder="Max Negative %" class="bt-form-input p-inputtext-sm" formControlName="maxNegativePercentage" />
         </div>
 
         
@@ -241,7 +241,7 @@
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">
-        <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table</h2>
+        <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table (Total results {{outputList.length}})</h2>
         <div class="mr-3">
           <label class="switch">
             <input type="checkbox" [(ngModel)]="isYearlySumEnabled">
@@ -284,20 +284,22 @@
         </tr>
       </ng-template>
 
+      <!-- <div class="flex justify-content-between mb-2">
+        <div><i class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" tooltipPosition="top" pTooltip="Prev"
+            (click)="prevPage()"></i></div>
+        <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
+            (click)="nextPage1()"></i></div>
+      </div> -->
+
     </p-table>
-    <div class="flex justify-content-between mb-2">
-      <div><i class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" tooltipPosition="top" pTooltip="Prev"
-          (click)="prevPage()"></i></div>
-      <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
-          (click)="nextPage()"></i></div>
-    </div>
+  
   </p-card>
 </div>
 <div class="out-put main unmodified" style="max-width: 60%;" *ngIf="outputData.length">
   <p-card styleClass="mt-3">
     <ng-template pTemplate="header">
       <div class="stock-header">
-        <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table</h2>
+        <h2 class="px-3 pt-3" style="flex-grow: 1;">Output Table </h2>
         <div class="mr-3">
           <label class="switch">
             <input type="checkbox" [(ngModel)]="isYearlySumEnabled">
@@ -328,8 +330,8 @@
     <!-- <div class="flex justify-content-between mb-2">
       <div><i class="pi pi-angle-left cursor-pointer" style="font-size: 2rem" tooltipPosition="top" pTooltip="Prev"
           (click)="prevPage()"></i></div>
-      <div><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
-          (click)="nextPage()"></i></div>
+      <div (click)="nextPage()"><i class="pi pi-angle-right cursor-pointer" style="font-size: 2rem" pTooltip="Next" tooltipPosition="top"
+          ></i></div>
     </div> -->
   </p-card>
 </div>
