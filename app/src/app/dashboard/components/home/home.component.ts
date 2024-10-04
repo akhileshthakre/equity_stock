@@ -658,7 +658,8 @@ export class HomeComponent implements OnInit {
             this.startBackTest()
         }
     }
-    nextPage() {
+    nextPage1() {
+        console.log("this.pageNumber", this.pageNumber)
         if (this.pageNumber > -1) {
             ++this.pageNumber;
             this.startBackTest()
