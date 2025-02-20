@@ -15,18 +15,49 @@ const batchArray = (arr, batchSize) => {
   return batches;
 };
 
+// Helper to process the fetched stock data
+const processStockData = (results, symbol, userId) => {
+  // Construct keys based on the expected output from Python
+  const closeKey = `('Close', '${symbol}')`;
+  const highKey = `('High', '${symbol}')`;
+  const lowKey = `('Low', '${symbol}')`;
+  const openKey = `('Open', '${symbol}')`;
+
+  // Check that all required keys exist
+  if (!results[openKey] || !results[closeKey] || !results[highKey] || !results[lowKey]) {
+    console.error(`Missing data for symbol ${symbol}`);
+    return [];
+  }
+
+  return Object.keys(results[openKey]).map((timestamp) => {
+    // Convert timestamp string to number for proper formatting
+    const date = moment(Number(timestamp)).format('YYYY-MM-DD HH:mm:ss');
+    return {
+      name: symbol,
+      period: date,
+      price: results[closeKey][timestamp],
+      high: results[highKey][timestamp],
+      low: results[lowKey][timestamp],
+      open: results[openKey][timestamp],
+      userId: userId,
+    };
+  });
+};
+
 const SearchController = {
   getSearchStock: async (req, res) => {
     const userId = req.user.userId;
     const { symbols, startDate, endDate } = req.body;
 
+    console.log(symbols, startDate, endDate);
+
     try {
       let allResults = [];
       
-      // Batch stock symbols in groups of 5 to avoid overloading the system
+      // Batch stock symbols in groups (adjust batch size as needed)
       const symbolBatches = batchArray(symbols, 10);
 
-      // Fetch data for each batch in parallel
+      // Process each batch in sequence
       for (const batch of symbolBatches) {
         const fetchPromises = batch.map(async (symbol) => {
           const pythonScript = `python3 getStockData.py ${symbol} ${startDate} ${endDate}`;
@@ -34,21 +65,8 @@ const SearchController = {
           // Fetch stock data using the Python script
           const { stdout } = await execAsync(pythonScript);
           const results = JSON.parse(stdout);
-
-          // Adjust data mapping to match the database schema
-          return Object.keys(results.Open).map((timestamp) => {
-            const date = moment(parseInt(timestamp)).format('YYYY-MM-DD HH:mm:ss');
-
-            return {
-              name: symbol,
-              period: date,
-              price: results['Close'][timestamp], 
-              high: results['High'][timestamp],   
-              low: results['Low'][timestamp],     
-              open: results['Open'][timestamp],   
-              userId: userId,                     
-            };
-          });
+          // Process the data using the helper function
+          return processStockData(results, symbol, userId);
         });
 
         // Wait for all fetches in the current batch to complete
@@ -58,7 +76,7 @@ const SearchController = {
         allResults = allResults.concat(...batchResults);
       }
 
-      // Perform the bulk insert/update after fetching all batches
+      // Bulk insert/update if data was retrieved
       if (allResults.length > 0) {
         await Stock.bulkCreate(allResults, {
           updateOnDuplicate: ['name', 'period', 'price', 'high', 'low', 'open', 'userId'],
@@ -96,7 +114,7 @@ const SearchController = {
 
       const formattedYesterday = yesterday.format("YYYY-MM-DD");
 
-      // Batch stock symbols and fetch data for each batch in parallel
+      // Batch stock symbols and process each batch in parallel
       const symbolBatches = batchArray(stocks.map((row) => row.stocks), 5);
       
       for (const batch of symbolBatches) {
@@ -104,22 +122,11 @@ const SearchController = {
           const pythonScript = `python3 getStockData.py ${symbol} ${formattedYesterday} ${today}`;
           const { stdout } = await execAsync(pythonScript);
           const results = JSON.parse(stdout);
-
-          return Object.keys(results.Open).map((timestamp) => ({
-            name: symbol,
-            period: moment(parseInt(timestamp)).format('YYYY-MM-DD HH:mm:ss'),
-            price: results['Close'][timestamp],
-            high: results['High'][timestamp],
-            low: results['Low'][timestamp],
-            open: results['Open'][timestamp],
-            userId: userId,
-          }));
+          return processStockData(results, symbol, userId);
         });
 
         // Wait for the batch to complete
         const batchResults = await Promise.all(fetchPromises);
-
-        // Flatten and add to the final results
         allResults = allResults.concat(...batchResults);
       }
 
