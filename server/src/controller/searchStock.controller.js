@@ -1,6 +1,10 @@
 const db = require('../model');
 const { Op } = require('sequelize');
 const moment = require('moment');
+const xlsx = require('xlsx'); // Required for processing Excel files
+const archiver = require('archiver');
+const fs = require('fs');
+const path = require('path');
 const StockSymbols = db.stockSymbols;
 const Stock = db.stocks;
 const { exec } = require('child_process');
@@ -15,7 +19,7 @@ const batchArray = (arr, batchSize) => {
   return batches;
 };
 
-// Helper to process the fetched stock data
+// Helper to process the fetched stock data from Python
 const processStockData = (results, symbol, userId) => {
   // Construct keys based on the expected output from Python
   const closeKey = `('Close', '${symbol}')`;
@@ -94,48 +98,167 @@ const SearchController = {
     try {
       const userId = req.user.userId;
 
-      const stocks = await StockSymbols.findAll({
-        where: {
-          userId,
-          stocks: {
-            [Op.ne]: '',
-            [Op.not]: null,
-          },
-        },
+      // Get all stocks for the user from the Stock table
+      const stocks = await Stock.findAll({
+        where: { userId },
+        order: [['name', 'ASC'], ['period', 'ASC']]
       });
 
-      let allResults = [];
-      const today = moment().format("YYYY-MM-DD");
-      let yesterday = moment().subtract(1, "days");
-
-      if (yesterday.isoWeekday() === 6 || yesterday.isoWeekday() === 7) {
-        yesterday = moment().subtract(1, "weeks").weekday(5); // Last Friday
+      if (!stocks.length) {
+        return res.status(404).send({ message: 'No stocks found for download' });
       }
 
-      const formattedYesterday = yesterday.format("YYYY-MM-DD");
+      // Create temp directory if it doesn't exist
+      const tempDir = path.join(__dirname, '../../temp');
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
+      }
 
-      // Batch stock symbols and process each batch in parallel
-      const symbolBatches = batchArray(stocks.map((row) => row.stocks), 5);
-      
-      for (const batch of symbolBatches) {
-        const fetchPromises = batch.map(async (symbol) => {
-          const pythonScript = `python3 getStockData.py ${symbol} ${formattedYesterday} ${today}`;
-          const { stdout } = await execAsync(pythonScript);
-          const results = JSON.parse(stdout);
-          return processStockData(results, symbol, userId);
+      // Group stocks by symbol
+      const stocksBySymbol = stocks.reduce((acc, stock) => {
+        if (!acc[stock.name]) {
+          acc[stock.name] = [];
+        }
+        acc[stock.name].push({
+          Date: moment(stock.period).format('YYYY-MM-DD HH:mm:ss'),
+          Open: stock.open,
+          High: stock.high,
+          Low: stock.low,
+          Close: stock.price
         });
+        return acc;
+      }, {});
 
-        // Wait for the batch to complete
-        const batchResults = await Promise.all(fetchPromises);
-        allResults = allResults.concat(...batchResults);
+      // Create a zip archive
+      const archive = archiver('zip', {
+        zlib: { level: 9 }
+      });
+      
+      const zipFilePath = path.join(tempDir, `stocks_${userId}_${Date.now()}.zip`);
+      const output = fs.createWriteStream(zipFilePath);
+
+      archive.pipe(output);
+
+      // Create Excel files for each stock symbol and add to zip
+      for (const [symbol, data] of Object.entries(stocksBySymbol)) {
+        const workbook = xlsx.utils.book_new();
+        const worksheet = xlsx.utils.json_to_sheet(data);
+        xlsx.utils.book_append_sheet(workbook, worksheet, symbol);
+        
+        const excelFilePath = path.join(tempDir, `${symbol}.xlsx`);
+        xlsx.writeFile(workbook, excelFilePath);
+        
+        archive.file(excelFilePath, { name: `${symbol}.xlsx` });
       }
 
-      res.json(allResults);
+      await new Promise((resolve, reject) => {
+        output.on('close', resolve);
+        archive.on('error', reject);
+        archive.finalize();
+      });
+
+      // Send the zip file
+      res.download(zipFilePath, `stocks_${moment().format('YYYY-MM-DD')}.zip`, (err) => {
+        // Cleanup temp files after download
+        fs.unlinkSync(zipFilePath);
+        Object.keys(stocksBySymbol).forEach(symbol => {
+          const excelPath = path.join(tempDir, `${symbol}.xlsx`);
+          if (fs.existsSync(excelPath)) {
+            fs.unlinkSync(excelPath);
+          }
+        });
+      });
+
     } catch (error) {
-      console.error('Error retrieving stock data:', error);
+      console.error('Error downloading stocks:', error);
       res.status(500).send({
-        message: 'Error retrieving stock data. Please check stock symbols.',
-        success: 'false',
+        message: 'Error downloading stocks',
+        success: false
+      });
+    }
+  },
+
+
+  processExcelFile: async (req, res) => {
+    try {
+      const userId = req.user.userId;
+      const file = req.file;
+
+      if (!file) {
+        return res.status(400).send({ error: 'No file uploaded' });
+      }
+
+      // Read the Excel file from buffer (using Multer memory storage)
+      const workbook = xlsx.read(file.buffer, { type: 'buffer' });
+      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+      const data = xlsx.utils.sheet_to_json(worksheet);
+
+      if (!data.length) {
+        return res.status(400).send({ error: 'Excel file is empty' });
+      }
+
+      let allResults = [];
+      let errors = [];
+
+      // Process each row from Excel
+      for (const row of data) {
+        // Ensure required fields exist (assumed Excel columns: Symbols, StartDate, EndDate)
+        if (!row.Symbols || !row.StartDate || !row.EndDate) {
+          continue; // Skip invalid rows
+        }
+
+        const symbol = row.Symbols;
+        // Parse dates using various formats then format as YYYY-MM-DD for the Python script
+        const startDate = moment(row.StartDate, [
+          'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY/MM/DD',
+          'MM-DD-YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD',
+          'DD.MM.YYYY', 'MM.DD.YYYY', 'YYYY.MM.DD'
+        ]).format('YYYY-MM-DD');
+        const endDate = moment(row.EndDate, [
+          'MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY/MM/DD',
+          'MM-DD-YYYY', 'DD-MM-YYYY', 'YYYY-MM-DD', 
+          'DD.MM.YYYY', 'MM.DD.YYYY', 'YYYY.MM.DD'
+        ]).format('YYYY-MM-DD');
+
+        console.log(symbol, startDate, endDate);
+
+        try {
+          const pythonScript = `python3 getStockData.py ${symbol} ${startDate} ${endDate}`;
+          const { stdout } = await execAsync(pythonScript);
+
+          // Optionally, extract valid JSON in case there is extra output
+          const jsonStart = stdout.indexOf('{');
+          if (jsonStart === -1) {
+            throw new Error("Valid JSON output not found for symbol " + symbol);
+          }
+          const jsonString = stdout.slice(jsonStart);
+          const results = JSON.parse(jsonString);
+
+          const rowResults = processStockData(results, symbol, userId);
+          allResults = allResults.concat(rowResults);
+        } catch (err) {
+          console.error(`Error processing symbol ${symbol}:`, err);
+          errors.push({ symbol, error: err.message });
+        }
+      }
+
+      // Bulk insert/update if data was retrieved
+      if (allResults.length > 0) {
+        await Stock.bulkCreate(allResults, {
+          updateOnDuplicate: ['name', 'period', 'price', 'high', 'low', 'open', 'userId'],
+        });
+      }
+
+      res.json({
+        message: 'Excel file processed successfully',
+        processedRecords: allResults.length,
+        errors: errors.length > 0 ? errors : undefined,
+      });
+    } catch (error) {
+      console.error('Error processing Excel file:', error);
+      res.status(500).send({
+        error: 'Error processing Excel file',
+        details: error.message,
       });
     }
   },
