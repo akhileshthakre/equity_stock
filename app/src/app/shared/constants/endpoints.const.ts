@@ -4,6 +4,7 @@ export const END_POINT_CONST = {
         REGISTER: '/user/register',
         UPLOAD_FILE: '/upload/stockFile',
         UPLOAD_BULK_SEARCH_STOCK: '/searchStock/bulk',
+        DOWNLOAD_BULK_SEARCH_RESULT: '/searchStock/downloadStocks',
         UPLOAD_TEST_FILE: '/upload/testFile',
         GET_ALL_STOCKS: '/stock',
         DELETE_STOCK_LIST: '/stock/deleteStocks',

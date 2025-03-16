@@ -77,6 +77,38 @@ export class HomeComponent implements OnInit {
         //this.getTestValuesFile()
     }
 
+    downloadBulkSearchResult() {
+        this.spinnerService.showSpinner(true);
+        
+        this._stockService.downloadBulkSearchResult().subscribe({
+            next: (res: Blob) => {  // Ensure the response type is Blob
+                this.spinnerService.showSpinner(false);
+    
+                if (res) {
+                    // Create a URL for the blob
+                    const fileURL = window.URL.createObjectURL(res);
+    
+                    // Create a temporary anchor tag to trigger the download
+                    const a = document.createElement('a');
+                    a.href = fileURL;
+                    a.download = `${new Date().getTime()}_bulk_search_result.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a); // Cleanup
+    
+                    // Display success message
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Downloaded' });
+                }
+            },
+            error: (err: any) => {
+                this.spinnerService.showSpinner(false);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Download Failed' });
+            }
+        });
+    }
+    
+
+
     onBasicUploadAuto(event: UploadEvent, fileUpload: any) {
         this.spinnerService.showSpinner(true)
        // console.log("event", event.file)

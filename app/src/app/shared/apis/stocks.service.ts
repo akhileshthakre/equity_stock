@@ -36,6 +36,17 @@ export class StocksApiService {
     )
   }
 
+  downloadBulkSearchResult(): any {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.DOWNLOAD_BULK_SEARCH_RESULT}`, { responseType: 'blob' }).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
   uploadBulkStockSearch(payload: any) {
     let params = new HttpParams();
     const headers = new HttpHeaders();

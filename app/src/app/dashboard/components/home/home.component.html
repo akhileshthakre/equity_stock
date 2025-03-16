@@ -44,12 +44,21 @@
         </div>
        
       </form>
+
       <p-divider type="dotted" />
-            <p-fileUpload name="demo[]" #fileUpload1 [multiple]="false" (uploadHandler)="onBasicUploadAuto($event, fileUpload1)"
-      [customUpload]="true" accept=".xlsx">
-      
-    </p-fileUpload>
-    </ng-container>
+      <h4 class="pl-2">Upload stocks to search (.xlsx)</h4>
+      <div class="grid align-items-start">
+        <p-fileUpload name="demo[]" #fileUpload1 [multiple]="false" (uploadHandler)="onBasicUploadAuto($event, fileUpload1)"
+        [customUpload]="true" accept=".xlsx">
+      </p-fileUpload>
+      <div class="mt-3">
+       <p-button  icon="pi pi-download" severity="success" (click)="downloadBulkSearchResult()"></p-button>
+      </div>
+      </div>
+           
+    
+
+  </ng-container>
 
 
     <ng-template #notSearchStock>
