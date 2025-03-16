@@ -3,6 +3,7 @@ export const END_POINT_CONST = {
         GET_TOKEN: '/user/login',
         REGISTER: '/user/register',
         UPLOAD_FILE: '/upload/stockFile',
+        UPLOAD_BULK_SEARCH_STOCK: '/searchStock/bulk',
         UPLOAD_TEST_FILE: '/upload/testFile',
         GET_ALL_STOCKS: '/stock',
         DELETE_STOCK_LIST: '/stock/deleteStocks',

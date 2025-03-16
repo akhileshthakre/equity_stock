@@ -36,12 +36,19 @@
               </ng-template>
             </p-calendar>
           </div>
+        
+          <div class="stockSearchForm-btn">
+            <p-button type="submit" label="Search Stock" [disabled]="!stockSearchForm.valid || dateRange.length == 1"
+              (click)="searchStock()"></p-button>
+          </div>
         </div>
-        <div class="stockSearchForm-btn">
-          <p-button type="submit" label="Search Stock" [disabled]="!stockSearchForm.valid || dateRange.length == 1"
-            (click)="searchStock()"></p-button>
-        </div>
+       
       </form>
+      <p-divider type="dotted" />
+            <p-fileUpload name="demo[]" #fileUpload1 [multiple]="false" (uploadHandler)="onBasicUploadAuto($event, fileUpload1)"
+      [customUpload]="true" accept=".xlsx">
+      
+    </p-fileUpload>
     </ng-container>
 
 

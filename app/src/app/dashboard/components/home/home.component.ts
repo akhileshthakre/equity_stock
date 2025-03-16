@@ -77,7 +77,38 @@ export class HomeComponent implements OnInit {
         //this.getTestValuesFile()
     }
 
+    onBasicUploadAuto(event: UploadEvent, fileUpload: any) {
+        this.spinnerService.showSpinner(true)
+       // console.log("event", event.file)
+        for (let file of event.files) {
+            this.uploadedFiles.push(file);
+        }
+        console.log("this.uploadedFiles", this.uploadedFiles)
+        this._stockService.uploadBulkStockSearch(this.uploadedFiles[0]).subscribe({
+            next: (res: any) => {
+                console.log("res------->", res)
+                this.spinnerService.showSpinner(false)
+                if (res) {
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded' });
+                    this.searchStocksData = res.data
+                    this.showOutPutTable = true
+                    while (this.uploadedFiles.length) {
+                        this.uploadedFiles.pop();
+                    }
+                    fileUpload.clear()
+                } else {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' });
+                }
+            },
+            error: (err: any) => {
+                this.spinnerService.showSpinner(false)
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' });
+                fileUpload.clear()
+            }
+        })  
 
+
+    }
 
     get slossPercentControl() {
         return this.backTestForm.get('slossPercent')
@@ -126,9 +157,7 @@ export class HomeComponent implements OnInit {
         this.searchStocksData = []
         this._stockService.deleteAllStockList().pipe(switchMap((val) =>
             this._stockService.uploadStockXlsxFile(this.uploadedFiles)
-        ))
-            //.pipe(switchMap(val => this._stockService.getAllStockInfo()))
-            .subscribe({
+        )).subscribe({
                 next: (res: any) => {
                     this.spinnerService.showSpinner(false)
                     if (res) {
