@@ -52,7 +52,7 @@
         [customUpload]="true" accept=".xlsx">
       </p-fileUpload>
       <div class="mt-3">
-       <p-button  icon="pi pi-download" severity="success" (click)="downloadBulkSearchResult()"></p-button>
+       <p-button  [disabled]="!downloadReadyforBulkSearch" icon="pi pi-download" severity="success" (click)="downloadBulkSearchResult()"></p-button>
       </div>
       </div>
            

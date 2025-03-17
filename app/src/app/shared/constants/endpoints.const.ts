@@ -5,6 +5,7 @@ export const END_POINT_CONST = {
         UPLOAD_FILE: '/upload/stockFile',
         UPLOAD_BULK_SEARCH_STOCK: '/searchStock/bulk',
         DOWNLOAD_BULK_SEARCH_RESULT: '/searchStock/downloadStocks',
+        CHECK_PROCESSING_STATUS_SEARCHSTOCK: '/searchStock/listen',
         UPLOAD_TEST_FILE: '/upload/testFile',
         GET_ALL_STOCKS: '/stock',
         DELETE_STOCK_LIST: '/stock/deleteStocks',

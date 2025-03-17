@@ -36,6 +36,9 @@ export class StocksApiService {
     )
   }
 
+  checkBulkSearchStockProcessingStatus(): Observable<any> {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.CHECK_PROCESSING_STATUS_SEARCHSTOCK}`);
+  }
   downloadBulkSearchResult(): any {
     return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.DOWNLOAD_BULK_SEARCH_RESULT}`, { responseType: 'blob' }).pipe(
       map((res: any) => {

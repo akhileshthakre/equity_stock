@@ -7,6 +7,9 @@ import { groupBy, switchMap } from 'rxjs';
 import { StocksApiService } from 'src/app/shared/apis/stocks.service';
 import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
 import * as XLSX from 'xlsx';
+import { interval } from 'rxjs';
+import { takeWhile, finalize } from 'rxjs/operators';
+
 
 interface UploadEvent {
     // originalEvent: Event;
@@ -46,6 +49,10 @@ export class HomeComponent implements OnInit {
     outputList: any[] = []
     outputData: any[] = []
     maxDate: Date = new Date()
+    isProcessingBulSearchJob: boolean = false;
+    pollingInterval: number = 5000;
+    maxPollingAttempts: number = 50;
+    downloadReadyforBulkSearch: boolean = false;
     backTestForm: FormGroup = this.formBuilder.group({
         // slossPercent: [],
         // tgPercent: [],
@@ -108,9 +115,39 @@ export class HomeComponent implements OnInit {
     }
     
 
+    private startPollingForProcessingStatus(): void {
+        let attempts = 0;
+
+        interval(this.pollingInterval)
+            .pipe(
+                takeWhile(() => this.isProcessingBulSearchJob && attempts < this.maxPollingAttempts), // ✅ Stop after max attempts
+                switchMap(() => {
+                    console.log(`Polling attempt ${attempts + 1}...`);
+                    attempts++;
+                    return this._stockService.checkBulkSearchStockProcessingStatus(); // ✅ API call
+                }),
+                finalize(() => {
+                    console.log("Polling stopped after max attempts or completion.");
+                })
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res && res.status === 'completed') { // ✅ Backend response expected as { status: 'completed' }
+                        this.isProcessingBulSearchJob = false;
+                        this.downloadReadyforBulkSearch = true; // ✅ Enable download button
+                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Processing Completed! File Ready to Download' });
+                    }
+                },
+                error: (err: any) => {
+                    console.error("Polling error:", err);
+                }
+            });
+    }
+
 
     onBasicUploadAuto(event: UploadEvent, fileUpload: any) {
-        this.spinnerService.showSpinner(true)
+        this.spinnerService.showSpinner(true);
+        //isProcessingBulSearchJob
        // console.log("event", event.file)
         for (let file of event.files) {
             this.uploadedFiles.push(file);
@@ -120,14 +157,14 @@ export class HomeComponent implements OnInit {
             next: (res: any) => {
                 console.log("res------->", res)
                 this.spinnerService.showSpinner(false)
+                
                 if (res) {
                     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded' });
-                    this.searchStocksData = res.data
-                    this.showOutPutTable = true
-                    while (this.uploadedFiles.length) {
-                        this.uploadedFiles.pop();
-                    }
-                    fileUpload.clear()
+                    this.isProcessingBulSearchJob = true; // ✅ Set processing flag
+                    this.downloadReadyforBulkSearch = false; // ✅ Disable download button
+                    this.startPollingForProcessingStatus(); // ✅ Begin polling
+
+                    fileUpload.clear(); // ✅ Clear file input
                 } else {
                     this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' });
                 }
