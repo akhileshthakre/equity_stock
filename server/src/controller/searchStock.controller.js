@@ -223,7 +223,7 @@ const SearchController = {
       });
 
       if (!stocks.length) {
-        return res.status(404).send({ message: 'No stocks found for download' });
+        return res.status(200).send({ status : false, message: 'No stocks found for download' });
       }
 
       // Create temp directory if it doesn't exist
@@ -291,7 +291,7 @@ const SearchController = {
       console.error('Error downloading stocks:', error);
       res.status(500).send({
         message: 'Error downloading stocks',
-        success: false
+        status: false
       });
     }
   },
@@ -336,26 +336,42 @@ const SearchController = {
 
   listenStatus: async (req, res) => {
     try {
-      // Expect the jobId as a query parameter, e.g., /listen?jobId=123
       const { jobId } = req.query;
-      if (!jobId) {
-        return res.status(400).json({ error: 'Job ID is required' });
+      let job;
+      
+      if (jobId) {
+        job = await excelProcessingQueue.getJob(jobId);
+        if (!job) {
+          return res.status(404).json({ error: 'Job not found' });
+        }
+      } else {
+        // If no jobId, get the latest active job
+        const activeJobs = await excelProcessingQueue.getActive();
+        const waitingJobs = await excelProcessingQueue.getWaiting();
+        const allJobs = [...activeJobs, ...waitingJobs];
+        
+        if (allJobs.length === 0) {
+          return res.status(200).json({ state: 'completed' });
+        }
+        
+        // Get the most recent job
+        job = allJobs.reduce((latest, current) => {
+          return !latest || current.timestamp > latest.timestamp ? current : latest;
+        });
       }
-  
-      // Get the job from the queue using its ID
-      const job = await excelProcessingQueue.getJob(jobId);
-      if (!job) {
-        return res.status(404).json({ error: 'Job not found' });
-      }
-  
+
       // Get the current state and progress
       const state = await job.getState();
       const progress = job.progress();
-  
-      // Optionally, if the job is completed you might want to return its result
       const result = job.returnvalue;
-  
-      res.json({ jobId, state, progress, result });
+
+      res.json({ 
+        jobId: job.id,
+        state, 
+        progress, 
+        result 
+      });
+      
     } catch (error) {
       console.error('Error retrieving job status:', error);
       res.status(500).json({ error: error.message });

@@ -9,6 +9,7 @@ import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
 import * as XLSX from 'xlsx';
 import { interval } from 'rxjs';
 import { takeWhile, finalize } from 'rxjs/operators';
+import { Router, NavigationEnd } from '@angular/router';
 
 
 interface UploadEvent {
@@ -51,8 +52,10 @@ export class HomeComponent implements OnInit {
     maxDate: Date = new Date()
     isProcessingBulSearchJob: boolean = false;
     pollingInterval: number = 5000;
-    maxPollingAttempts: number = 50;
+    maxPollingAttempts: number = 100;
     downloadReadyforBulkSearch: boolean = false;
+    isCheckOnPageLoadDownloadStock: boolean = false;
+    pollingSubscription: any;
     backTestForm: FormGroup = this.formBuilder.group({
         // slossPercent: [],
         // tgPercent: [],
@@ -77,11 +80,35 @@ export class HomeComponent implements OnInit {
         this.showFilters = !this.showFilters;  // Toggle the visibility of the filters
     }
 
-    constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
+    constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, 
+        private spinnerService: SpinnerService,
+        private router: Router
+    ) { }
 
     ngOnInit() {
         //this.getStocksFile();
         //this.getTestValuesFile()
+
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd && event.url === '/dashboard/home') {
+                this.isCheckOnPageLoadDownloadStock = true;
+                this.startPollingForProcessingStatus();
+            }
+        });
+
+        
+        this.isProcessingBulSearchJob = true; // ✅ Set processing flag
+        this.downloadReadyforBulkSearch = false; // ✅ Disable download button
+        this.isCheckOnPageLoadDownloadStock = true;
+        this.startPollingForProcessingStatus(); // ✅ Begin polling
+    }
+
+    ngOnDestroy() {
+        this.isProcessingBulSearchJob = false;
+        if (this.pollingSubscription) {
+            this.pollingSubscription.unsubscribe();
+            this.pollingSubscription = null;
+        }
     }
 
     downloadBulkSearchResult() {
@@ -118,7 +145,7 @@ export class HomeComponent implements OnInit {
     private startPollingForProcessingStatus(): void {
         let attempts = 0;
 
-        interval(this.pollingInterval)
+        this.pollingSubscription = interval(this.pollingInterval)
             .pipe(
                 takeWhile(() => this.isProcessingBulSearchJob && attempts < this.maxPollingAttempts), // ✅ Stop after max attempts
                 switchMap(() => {
@@ -132,10 +159,13 @@ export class HomeComponent implements OnInit {
             )
             .subscribe({
                 next: (res: any) => {
-                    if (res && res.status === 'completed') { // ✅ Backend response expected as { status: 'completed' }
+                    if (res && res.state === 'completed') { // ✅ Backend response expected as { status: 'completed' }
                         this.isProcessingBulSearchJob = false;
                         this.downloadReadyforBulkSearch = true; // ✅ Enable download button
-                        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Processing Completed! File Ready to Download' });
+                        if(!this.isCheckOnPageLoadDownloadStock) {
+                            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Processing Completed! File Ready to Download' });
+                        }
+                        this.isCheckOnPageLoadDownloadStock = false;
                     }
                 },
                 error: (err: any) => {
