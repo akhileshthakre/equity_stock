@@ -314,7 +314,19 @@ const SearchController = {
         return res.status(400).send({ error: 'Excel file is empty' });
       }
 
-      // Add job to queue
+      // Remove all pending and active jobs for this user
+      const activeJobs = await excelProcessingQueue.getActive();
+      const waitingJobs = await excelProcessingQueue.getWaiting();
+      const allJobs = [...activeJobs, ...waitingJobs];
+
+      for (const job of allJobs) {
+        const jobData = await job.data;
+        if (jobData && jobData.userId === userId) {
+          await job.remove();
+        }
+      }
+
+      // Add new job to queue
       const job = await excelProcessingQueue.add({
         data,
         userId
