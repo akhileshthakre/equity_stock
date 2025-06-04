@@ -50,12 +50,13 @@ export class StocksApiService {
     );
   }
 
-  uploadBulkStockSearch(payload: any) {
+  uploadBulkStockSearch(payload: any, isYahooAPI: boolean = false) {
     let params = new HttpParams();
     const headers = new HttpHeaders();
     headers.set('Accept', "multipart/form-data");
     const formData = new FormData();
     formData.append("file", payload);
+    params = params.append('isYahooAPI', isYahooAPI.toString());
     return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_BULK_SEARCH_STOCK}`, formData, { params, headers }).pipe(
       map((res: any) => {
         if (res) {

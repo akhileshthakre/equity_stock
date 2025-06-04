@@ -293,7 +293,8 @@ const SearchController = {
     try {
       const userId = req.user.userId;
       const file = req.file;
-      const { isYahooAPI } = req.body;
+      const { isYahooAPI } = req.query;
+
 
       if (!file) {
         return res.status(400).send({ error: 'No file uploaded' });
