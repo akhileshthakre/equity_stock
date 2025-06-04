@@ -196,7 +196,7 @@ export class HomeComponent implements OnInit {
             this.uploadedFiles.push(file);
         }
         console.log("this.uploadedFiles", this.uploadedFiles)
-        this._stockService.uploadBulkStockSearch(this.uploadedFiles[this.uploadedFiles.length-1]).subscribe({
+        this._stockService.uploadBulkStockSearch(this.uploadedFiles[this.uploadedFiles.length-1], this.isYahooAPI).subscribe({
             next: (res: any) => {
                 console.log("res------->", res)
                 this.spinnerService.showSpinner(false)
