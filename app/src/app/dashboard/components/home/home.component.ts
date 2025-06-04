@@ -76,6 +76,13 @@ export class HomeComponent implements OnInit {
     isSearchStock: boolean = false;
     showFilters: boolean = false;  // Controls the visibility of the filter form
 
+    apiSources : any[] = [
+        { label: 'Yahoo', value: 'yahoo' },
+        { label: 'EODHD', value: 'eodhd' }
+    ];
+    selectedAPISource: any = 'yahoo';  // Default API source
+    isYahooAPI: boolean = true;
+
     toggleFilters() {
         this.showFilters = !this.showFilters;  // Toggle the visibility of the filters
     }
@@ -87,7 +94,7 @@ export class HomeComponent implements OnInit {
 
     ngOnInit() {
         //this.getStocksFile();
-        //this.getTestValuesFile()
+        //this.getTestValuesFile()  
 
         this.router.events.subscribe(event => {
             if (event instanceof NavigationEnd && event.url === '/dashboard/home') {
@@ -109,6 +116,12 @@ export class HomeComponent implements OnInit {
             this.pollingSubscription.unsubscribe();
             this.pollingSubscription = null;
         }
+    }
+
+   onAPISourceChange(selectedValue: any): void {
+        this.isYahooAPI = selectedValue?.value?.value === 'yahoo';
+        console.log("Selected API Source:", selectedValue.value.value, selectedValue?.value === 'yahoo');
+        this.selectedAPISource = selectedValue?.value?.value
     }
 
     downloadBulkSearchResult() {
@@ -803,7 +816,9 @@ export class HomeComponent implements OnInit {
             const payload = {
                 symbols: this.stocks,
                 startDate: this.datePipe.transform(this.dateRange[0], 'yyyy-MM-dd'),
-                endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate
+                endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate,
+                isYahooAPI: this.isYahooAPI,
+
             }
             this.products = []
             this.stockData = []

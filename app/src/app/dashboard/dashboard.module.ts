@@ -16,6 +16,8 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AuthGuardService } from '../shared/guards/auth-guard.service';
 import { ExecutionComponent } from './components/execution/execution.component';
 import { DividerModule } from 'primeng/divider';
+import { DropdownModule } from 'primeng/dropdown';
+
 
 @NgModule({
   declarations: [
@@ -36,7 +38,8 @@ import { DividerModule } from 'primeng/divider';
     SharedModule,
     FormsModule,
     ProgressSpinnerModule, CalendarModule,
-    DividerModule
+    DividerModule,
+    DropdownModule
   ],
   providers : [AuthGuardService]
 })

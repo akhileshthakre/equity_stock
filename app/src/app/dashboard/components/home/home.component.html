@@ -17,7 +17,18 @@
     </ng-template>
     <p-toast></p-toast>
 
+ <p-dropdown 
+            [options]="apiSources" 
+            [(ngModel)]="selectedAPISource" 
+            placeholder="Select API Source"
+            optionLabel="label"
+            styleClass="p-inputtext-sm"
+             [style]="{width: '100%'}"
+             *ngIf="isSearchStock"
+              (onChange)="onAPISourceChange($event)">
+              
 
+          ></p-dropdown>
     <ng-container *ngIf="isSearchStock ; else notSearchStock">
       <form [formGroup]="stockSearchForm">
         <div class="stockSearchForm-inputs">
