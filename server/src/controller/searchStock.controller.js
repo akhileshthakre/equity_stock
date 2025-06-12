@@ -61,6 +61,8 @@ const processStockDataForSearch = (results, symbol, userId) => {
   const lowKey = `('Low', '${symbol}')`;
   const openKey = `('Open', '${symbol}')`;
 
+  console.log(results);
+
 
   if (!results[openKey] || !results[closeKey] || !results[highKey] || !results[lowKey]) {
     console.error(`Missing data for symbol ${symbol}`);
@@ -83,7 +85,7 @@ const processStockDataForSearch = (results, symbol, userId) => {
 
 // Process Excel job handler
 excelProcessingQueue.process(async (job) => {
-  const { data, userId, uploadId, isYahooAPI } = job.data;
+  const { data, userId, uploadId, apiSource } = job.data;
   let allResults = [];
   let errors = [];
   const BATCH_SIZE = 2000;
@@ -117,9 +119,11 @@ excelProcessingQueue.process(async (job) => {
     ]).format('YYYY-MM-DD');
 
     try {
-      const pythonScript = isYahooAPI
+      const pythonScript = apiSource == "yahoo"
         ? `python3 getStockData.py ${symbol} ${startDate} ${endDate}`
-        : `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`;
+        : apiSource == "eod"
+          ? `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`
+          : `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`;
       const { stdout } = await execAsync(pythonScript);
 
       // Check cancellation again after async operation
@@ -176,7 +180,7 @@ excelProcessingQueue.process(async (job) => {
 const SearchController = {
   getSearchStock: async (req, res) => {
     const userId = req.user.userId;
-    const { symbols, startDate, endDate, isYahooAPI } = req.body;
+    const { symbols, startDate, endDate, apiSource } = req.body;
 
 
     try {
@@ -190,9 +194,11 @@ const SearchController = {
 
       for (const batch of symbolBatches) {
         const fetchPromises = batch.map(async (symbol) => {
-          const pythonScript = isYahooAPI
+          const pythonScript = apiSource == "yahoo"
             ? `python3 getStockData.py ${symbol} ${startDate} ${endDate}`
-            : `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`;
+            : apiSource == "eod"
+              ? `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`
+              : `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`;
           const { stdout } = await execAsync(pythonScript);
           const results = JSON.parse(stdout);
           return processStockDataForSearch(results, symbol, userId);
@@ -293,7 +299,8 @@ const SearchController = {
     try {
       const userId = req.user.userId;
       const file = req.file;
-      const { isYahooAPI } = req.body;
+      const { apiSource } = req.query;
+
 
       if (!file) {
         return res.status(400).send({ error: 'No file uploaded' });
@@ -330,7 +337,7 @@ const SearchController = {
         data,
         userId,
         uploadId: newUploadId,
-        isYahooAPI
+        apiSource
       });
 
       res.json({
