@@ -78,7 +78,8 @@ export class HomeComponent implements OnInit {
 
     apiSources : any[] = [
         { label: 'Yahoo', value: 'yahoo' },
-        { label: 'EODHD', value: 'eodhd' }
+        { label: 'EODHD', value: 'eod' },
+        { label: 'Twelvedata', value: 'twelvedata' }
     ];
     selectedAPISource: any = 'yahoo';  // Default API source
     isYahooAPI: boolean = true;
@@ -118,11 +119,11 @@ export class HomeComponent implements OnInit {
         }
     }
 
-   onAPISourceChange(selectedValue: any): void {
-        this.isYahooAPI = selectedValue?.value?.value === 'yahoo';
-        console.log("Selected API Source:", selectedValue.value.value, selectedValue?.value === 'yahoo');
-        this.selectedAPISource = selectedValue?.value?.value
-    }
+  onAPISourceChange(selectedValue: any): void {
+    this.selectedAPISource = selectedValue.value;  // Correct binding
+    this.isYahooAPI = this.selectedAPISource === 'yahoo';
+    console.log("Selected API Source:", this.selectedAPISource);
+}
 
     downloadBulkSearchResult() {
         this.spinnerService.showSpinner(true);
@@ -818,6 +819,7 @@ export class HomeComponent implements OnInit {
                 startDate: this.datePipe.transform(this.dateRange[0], 'yyyy-MM-dd'),
                 endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate,
                 isYahooAPI: this.isYahooAPI,
+                apiSource : this.selectedAPISource
 
             }
             this.products = []
