@@ -1,0 +1,24 @@
+# docker-compose.yml 
+version: "3.8"
+
+services:
+  quity-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MODE: development
+    container_name: quity-frontend
+    ports:
+      - "4200:4200"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    networks:
+      - twicg-net
+    restart: always
+
+networks:
+  twicg-net:
+    external: true
