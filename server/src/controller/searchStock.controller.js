@@ -216,7 +216,7 @@ const SearchController = {
       res.json(allResults);
     } catch (error) {
       console.error('Error retrieving stock data:', error);
-      res.status(500).send({ error: 'Error retrieving stock data' });
+      res.status(200).send({ error: 'Error retrieving stock data' });
     }
   },
 
@@ -288,7 +288,7 @@ const SearchController = {
       });
     } catch (error) {
       console.error('Error downloading stocks:', error);
-      res.status(500).send({
+      res.status(200).send({
         message: 'Error downloading stocks',
         status: false
       });
@@ -346,7 +346,7 @@ const SearchController = {
       });
     } catch (error) {
       console.error('Error processing Excel file:', error);
-      res.status(500).send({
+      res.status(200).send({
         error: 'Error processing Excel file',
         details: error.message,
       });
@@ -390,7 +390,7 @@ const SearchController = {
       
     } catch (error) {
       console.error('Error retrieving job status:', error);
-      res.status(500).json({ error: error.message });
+      res.status(200).json({ error: error.message });
     }
   }
 };

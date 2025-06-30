@@ -77,7 +77,7 @@ const filesToUpload = async (req, res) => {
     const response = {
       error: 'Internal Server Error',
     };
-    res.status(500).json(response);
+    res.status(200).json(response);
   }
 };
 
@@ -141,7 +141,7 @@ const calculate = async (req, res) => {
     const response = {
       error: 'Internal Server Error',
     };
-    res.status(500).json(response);
+    res.status(200).json(response);
   }
 }
 
