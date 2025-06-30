@@ -36,6 +36,37 @@ export class StocksApiService {
     )
   }
 
+  checkBulkSearchStockProcessingStatus(): Observable<any> {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.CHECK_PROCESSING_STATUS_SEARCHSTOCK}`);
+  }
+  downloadBulkSearchResult(): any {
+    return this._http.get(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.DOWNLOAD_BULK_SEARCH_RESULT}`, { responseType: 'blob' }).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  uploadBulkStockSearch(payload: any, isYahooAPI: boolean = false) {
+    let params = new HttpParams();
+    const headers = new HttpHeaders();
+    headers.set('Accept', "multipart/form-data");
+    const formData = new FormData();
+    formData.append("file", payload);
+    params = params.append('isYahooAPI', isYahooAPI.toString());
+    return this._http.post(`${environment.BASE_URL}${END_POINT_CONST.STOCKS.UPLOAD_BULK_SEARCH_STOCK}`, formData, { params, headers }).pipe(
+      map((res: any) => {
+        if (res) {
+          return res;
+        }
+      }),
+      catchError(this.handleError)
+    );
+  }
+
   uploadStockXlsxFile(payload: any) {
     let params = new HttpParams();
     const headers = new HttpHeaders();

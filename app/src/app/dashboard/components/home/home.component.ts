@@ -7,6 +7,10 @@ import { groupBy, switchMap } from 'rxjs';
 import { StocksApiService } from 'src/app/shared/apis/stocks.service';
 import { SpinnerService } from 'src/app/shared/spinner/spinner.service';
 import * as XLSX from 'xlsx';
+import { interval } from 'rxjs';
+import { takeWhile, finalize } from 'rxjs/operators';
+import { Router, NavigationEnd } from '@angular/router';
+
 
 interface UploadEvent {
     // originalEvent: Event;
@@ -46,6 +50,12 @@ export class HomeComponent implements OnInit {
     outputList: any[] = []
     outputData: any[] = []
     maxDate: Date = new Date()
+    isProcessingBulSearchJob: boolean = false;
+    pollingInterval: number = 5000;
+    maxPollingAttempts: number = 100;
+    downloadReadyforBulkSearch: boolean = false;
+    isCheckOnPageLoadDownloadStock: boolean = false;
+    pollingSubscription: any;
     backTestForm: FormGroup = this.formBuilder.group({
         // slossPercent: [],
         // tgPercent: [],
@@ -66,18 +76,152 @@ export class HomeComponent implements OnInit {
     isSearchStock: boolean = false;
     showFilters: boolean = false;  // Controls the visibility of the filter form
 
+    apiSources : any[] = [
+        { label: 'Yahoo', value: 'yahoo' },
+        { label: 'EODHD', value: 'eod' },
+        { label: 'Twelvedata', value: 'twelvedata' }
+    ];
+    selectedAPISource: any = 'yahoo';  // Default API source
+    isYahooAPI: boolean = true;
+
     toggleFilters() {
         this.showFilters = !this.showFilters;  // Toggle the visibility of the filters
     }
 
-    constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, private spinnerService: SpinnerService) { }
+    constructor(private formBuilder: FormBuilder, private messageService: MessageService, private _stockService: StocksApiService, 
+        private spinnerService: SpinnerService,
+        private router: Router
+    ) { }
 
     ngOnInit() {
         //this.getStocksFile();
-        //this.getTestValuesFile()
+        //this.getTestValuesFile()  
+
+        this.router.events.subscribe(event => {
+            if (event instanceof NavigationEnd && event.url === '/dashboard/home') {
+                this.isCheckOnPageLoadDownloadStock = true;
+                this.startPollingForProcessingStatus();
+            }
+        });
+
+        
+        this.isProcessingBulSearchJob = true; // ✅ Set processing flag
+        this.downloadReadyforBulkSearch = false; // ✅ Disable download button
+        this.isCheckOnPageLoadDownloadStock = true;
+        this.startPollingForProcessingStatus(); // ✅ Begin polling
+    }
+
+    ngOnDestroy() {
+        this.isProcessingBulSearchJob = false;
+        if (this.pollingSubscription) {
+            this.pollingSubscription.unsubscribe();
+            this.pollingSubscription = null;
+        }
+    }
+
+  onAPISourceChange(selectedValue: any): void {
+    this.selectedAPISource = selectedValue.value;  // Correct binding
+    this.isYahooAPI = this.selectedAPISource === 'yahoo';
+    console.log("Selected API Source:", this.selectedAPISource);
+}
+
+    downloadBulkSearchResult() {
+        this.spinnerService.showSpinner(true);
+        
+        this._stockService.downloadBulkSearchResult().subscribe({
+            next: (res: Blob) => {  // Ensure the response type is Blob
+                this.spinnerService.showSpinner(false);
+    
+                if (res) {
+                    // Create a URL for the blob
+                    const fileURL = window.URL.createObjectURL(res);
+    
+                    // Create a temporary anchor tag to trigger the download
+                    const a = document.createElement('a');
+                    a.href = fileURL;
+                    a.download = `${new Date().getTime()}_bulk_search_result.zip`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a); // Cleanup
+    
+                    // Display success message
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Downloaded' });
+                }
+            },
+            error: (err: any) => {
+                this.spinnerService.showSpinner(false);
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Download Failed' });
+            }
+        });
+    }
+    
+
+    private startPollingForProcessingStatus(): void {
+        let attempts = 0;
+
+        this.pollingSubscription = interval(this.pollingInterval)
+            .pipe(
+                takeWhile(() => this.isProcessingBulSearchJob && attempts < this.maxPollingAttempts), // ✅ Stop after max attempts
+                switchMap(() => {
+                    console.log(`Polling attempt ${attempts + 1}...`);
+                    attempts++;
+                    return this._stockService.checkBulkSearchStockProcessingStatus(); // ✅ API call
+                }),
+                finalize(() => {
+                    console.log("Polling stopped after max attempts or completion.");
+                })
+            )
+            .subscribe({
+                next: (res: any) => {
+                    if (res && res.state === 'completed') { // ✅ Backend response expected as { status: 'completed' }
+                        this.isProcessingBulSearchJob = false;
+                        this.downloadReadyforBulkSearch = true; // ✅ Enable download button
+                        if(!this.isCheckOnPageLoadDownloadStock) {
+                            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Processing Completed! File Ready to Download' });
+                        }
+                        this.isCheckOnPageLoadDownloadStock = false;
+                    }
+                },
+                error: (err: any) => {
+                    console.error("Polling error:", err);
+                }
+            });
     }
 
 
+    onBasicUploadAuto(event: UploadEvent, fileUpload: any) {
+        this.spinnerService.showSpinner(true);
+        //isProcessingBulSearchJob
+       // console.log("event", event.file)
+        for (let file of event.files) {
+            this.uploadedFiles.push(file);
+        }
+        console.log("this.uploadedFiles", this.uploadedFiles)
+        this._stockService.uploadBulkStockSearch(this.uploadedFiles[this.uploadedFiles.length-1], this.isYahooAPI).subscribe({
+            next: (res: any) => {
+                console.log("res------->", res)
+                this.spinnerService.showSpinner(false)
+                
+                if (res) {
+                    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'File Uploaded' });
+                    this.isProcessingBulSearchJob = true; // ✅ Set processing flag
+                    this.downloadReadyforBulkSearch = false; // ✅ Disable download button
+                    this.startPollingForProcessingStatus(); // ✅ Begin polling
+
+                    fileUpload.clear(); // ✅ Clear file input
+                } else {
+                    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' });
+                }
+            },
+            error: (err: any) => {
+                this.spinnerService.showSpinner(false)
+                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Upload Failed' });
+                fileUpload.clear()
+            }
+        })  
+
+
+    }
 
     get slossPercentControl() {
         return this.backTestForm.get('slossPercent')
@@ -126,9 +270,7 @@ export class HomeComponent implements OnInit {
         this.searchStocksData = []
         this._stockService.deleteAllStockList().pipe(switchMap((val) =>
             this._stockService.uploadStockXlsxFile(this.uploadedFiles)
-        ))
-            //.pipe(switchMap(val => this._stockService.getAllStockInfo()))
-            .subscribe({
+        )).subscribe({
                 next: (res: any) => {
                     this.spinnerService.showSpinner(false)
                     if (res) {
@@ -675,7 +817,10 @@ export class HomeComponent implements OnInit {
             const payload = {
                 symbols: this.stocks,
                 startDate: this.datePipe.transform(this.dateRange[0], 'yyyy-MM-dd'),
-                endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate
+                endDate: this.dateRange[1] ? this.datePipe.transform(this.dateRange[1], 'yyyy-MM-dd') : maxdate,
+                isYahooAPI: this.isYahooAPI,
+                apiSource : this.selectedAPISource
+
             }
             this.products = []
             this.stockData = []
