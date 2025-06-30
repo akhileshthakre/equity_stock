@@ -39,7 +39,7 @@ const UserController = {
       res.status(201).json({ userId: newUser.id, username: newUser.email });
     } catch (error) {
       console.error('Error creating user:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(200).json({ error: 'Internal Server Error' });
     }
   },
   
@@ -61,7 +61,7 @@ const UserController = {
       res.json({ username, token });
     } catch (error) {
       console.error('Error logging in user:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      res.status(200).json({ error: 'Internal Server Error' });
     }
   },
 

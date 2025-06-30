@@ -44,7 +44,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
                 })
             } catch (loadError) {
                 console.error('Error loading Excel file:', loadError);
-                return res.status(500).json({ message: 'Internal Server Error' });
+                return res.status(200).json({ message: 'Internal Server Error' });
             }
 
         }else if(testFile) {
@@ -72,7 +72,7 @@ const uploadFileAndSyncDatabase = async (req, file, res) => {
 
     } catch (uploadError) {
         console.error('Error uploading file and syncing database:', uploadError);
-        res.status(500).json({ message: 'Internal Server Error' });
+        res.status(200).json({ message: 'Internal Server Error' });
     }
 };
 
