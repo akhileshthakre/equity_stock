@@ -48,7 +48,7 @@ try:
     for col in ['open', 'high', 'low', 'close']:
         key = f"('{col.capitalize()}', '{symbol}')"
         output[key] = {
-            str(int(index.timestamp() * 1000)): round(float(value), 2)
+            str(int(index.timestamp() * 1000)): float(value)
             for index, value in df[col].items()
         }
 

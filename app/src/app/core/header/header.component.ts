@@ -65,10 +65,10 @@ export class HeaderComponent {
           delete product.userId;
           product.name = String(product.name);
           product.period = this.datePipe.transform(product.period, 'yyyy-MM-dd');
-          product.high = String(Number(product.high).toFixed(2));
-          product.low = String(Number(product.low).toFixed(2));
-          product.open = String(Number(product.open).toFixed(2));
-          product.close = String(Number(product.close).toFixed(2));
+          product.high = String(product.high);
+          product.low = String(product.low);
+          product.open = String(product.open);
+          product.close = String(product.close);
         })
         const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(resp);
         const wb: XLSX.WorkBook = XLSX.utils.book_new();

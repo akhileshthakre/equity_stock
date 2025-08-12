@@ -45,10 +45,10 @@ const processStockData = (results, symbol, userId) => {
     return {
       name: symbol,
       period: date,
-      price: Number(parseFloat(results[closeKey][timestamp]).toFixed(2)),
-      high: Number(parseFloat(results[highKey][timestamp]).toFixed(2)),
-      low: Number(parseFloat(results[lowKey][timestamp]).toFixed(2)),
-      open: Number(parseFloat(results[openKey][timestamp]).toFixed(2)),
+      price: Number(results[closeKey][timestamp]),
+      high: Number(results[highKey][timestamp]),
+      low: Number(results[lowKey][timestamp]),
+      open: Number(results[openKey][timestamp]),
       userId: userId,
     };
   });

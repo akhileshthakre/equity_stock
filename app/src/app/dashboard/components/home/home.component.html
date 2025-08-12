@@ -204,10 +204,10 @@
           <tr>
             <td>{{product.name}}</td>
             <td>{{product.period | date:'dd-MM-yyyy'}}</td>
-            <td>{{product.open | number : '1.2-2'}}</td>
-            <td>{{product.high | number : '1.2-2'}}</td>
-            <td>{{product.low | number : '1.2-2'}}</td>
-            <td>{{product.price | number : '1.2-2'}}</td>
+            <td>{{product.open}}</td>
+            <td>{{product.high}}</td>
+            <td>{{product.low}}</td>
+            <td>{{product.price}}</td>
           </tr>
         </ng-template>
          <ng-template *ngIf="!products.length">
