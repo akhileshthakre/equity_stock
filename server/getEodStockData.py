@@ -52,11 +52,11 @@ try:
             dt_obj = datetime.strptime(entry['date'], "%Y-%m-%d")
             timestamp = int(dt_obj.timestamp() * 1000)
 
-            # Round and assign split-adjusted OHLC
-            result[f"('Open', '{symbol}')"][str(timestamp)]  = round(entry['open'],  2)
-            result[f"('High', '{symbol}')"][str(timestamp)]  = round(entry['high'],  2)
-            result[f"('Low', '{symbol}')"][str(timestamp)]   = round(entry['low'],   2)
-            result[f"('Close', '{symbol}')"][str(timestamp)] = round(entry['close'], 2)
+            # Assign split-adjusted OHLC without rounding
+            result[f"('Open', '{symbol}')"][str(timestamp)]  = entry['open']
+            result[f"('High', '{symbol}')"][str(timestamp)]  = entry['high']
+            result[f"('Low', '{symbol}')"][str(timestamp)]   = entry['low']
+            result[f"('Close', '{symbol}')"][str(timestamp)] = entry['close']
 
         print(json.dumps(result, indent=2))
 
