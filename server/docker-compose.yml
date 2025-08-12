@@ -5,3 +5,18 @@ services:
     container_name: equityStock-redis
     ports:
       - "6379:6379"
+
+  app:
+    build: .
+    container_name: es-backend
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    networks:
+      - twicg-net
+    restart: always
+
+networks:
+  twicg-net:
+    external: true
