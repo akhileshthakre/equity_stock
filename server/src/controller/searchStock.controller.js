@@ -123,7 +123,9 @@ excelProcessingQueue.process(async (job) => {
         ? `python3 getStockData.py ${symbol} ${startDate} ${endDate}`
         : apiSource == "eod"
           ? `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`
-          : `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`;
+          : apiSource == "twelvedata"
+            ? `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`
+            : `python3 getJQuantsStockData.py ${symbol} ${startDate} ${endDate}`;
       const { stdout } = await execAsync(pythonScript);
 
       // Check cancellation again after async operation
@@ -198,7 +200,9 @@ const SearchController = {
             ? `python3 getStockData.py ${symbol} ${startDate} ${endDate}`
             : apiSource == "eod"
               ? `python3 getEodStockData.py ${symbol} ${startDate} ${endDate}`
-              : `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`;
+              : apiSource == "twelvedata"
+                ? `python3 getTwelveStockData.py ${symbol} ${startDate} ${endDate}`
+                : `python3 getJQuantsStockData.py ${symbol} ${startDate} ${endDate}`;
           const { stdout } = await execAsync(pythonScript);
           const results = JSON.parse(stdout);
           return processStockDataForSearch(results, symbol, userId);

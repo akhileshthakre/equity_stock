@@ -79,7 +79,8 @@ export class HomeComponent implements OnInit {
     apiSources : any[] = [
         { label: 'Yahoo', value: 'yahoo' },
         { label: 'EODHD', value: 'eod' },
-        { label: 'Twelvedata', value: 'twelvedata' }
+        { label: 'Twelvedata', value: 'twelvedata' },
+        { label: 'JQuants', value: 'jquants' }
     ];
     selectedAPISource: any = 'yahoo';  // Default API source
     isYahooAPI: boolean = true;
